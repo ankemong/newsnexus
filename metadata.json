@@ -1,0 +1,5 @@
+{
+  "name": "NewsNexus",
+  "description": "A global news aggregation platform featuring keyword crawling, summarization, and multi-language support.",
+  "requestFramePermissions": []
+}
