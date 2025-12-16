@@ -1,0 +1,826 @@
+{
+  "features": [
+    {
+      "id": "user-authentication",
+      "name": "用户认证系统",
+      "description": "用户注册、登录、密码重置等功能",
+      "components": ["Auth.tsx", "authService.ts", "localAuthService.ts"],
+      "testSteps": [
+        {
+          "scenario": "用户注册",
+          "passes": false,
+          "steps": [
+            "打开应用，点击'注册'按钮",
+            "输入邮箱地址",
+            "输入密码",
+            "确认密码",
+            "点击'注册'提交",
+            "验证是否收到验证邮件",
+            "输入验证码完成注册"
+          ]
+        },
+        {
+          "scenario": "用户登录",
+          "passes": false,
+          "steps": [
+            "打开应用，点击'登录'按钮",
+            "输入已注册的邮箱",
+            "输入密码",
+            "点击'登录'按钮",
+            "验证是否成功跳转到仪表板"
+          ]
+        },
+        {
+          "scenario": "密码重置",
+          "passes": false,
+          "steps": [
+            "在登录页面点击'忘记密码'",
+            "输入注册邮箱",
+            "点击'发送重置链接'",
+            "检查邮箱是否收到重置邮件",
+            "点击邮件中的重置链接",
+            "输入新密码",
+            "确认新密码",
+            "提交重置请求"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "news-crawler",
+      "name": "新闻爬虫",
+      "description": "基于关键词的多语言新闻爬取功能",
+      "components": ["Crawler.tsx", "geminiService.ts", "realNewsService.ts"],
+      "testSteps": [
+        {
+          "scenario": "基础新闻搜索",
+          "passes": false,
+          "steps": [
+            "确保已配置 GEMINI_API_KEY",
+            "导航到'爬虫'页面",
+            "输入搜索关键词（如：'technology'）",
+            "选择目标语言",
+            "点击'开始爬取'按钮",
+            "等待爬取完成",
+            "验证返回的新闻列表是否包含相关内容",
+            "检查新闻来源、发布时间等元数据"
+          ]
+        },
+        {
+          "scenario": "多语言新闻搜索",
+          "passes": false,
+          "steps": [
+            "导航到'爬虫'页面",
+            "输入关键词",
+            "选择多个目标语言",
+            "启动爬取",
+            "验证返回的新闻包含所选语言",
+            "检查非英语新闻的翻译质量"
+          ]
+        },
+        {
+          "scenario": "批量关键词爬取",
+          "passes": false,
+          "steps": [
+            "在爬虫页面添加多个关键词",
+            "设置爬取间隔",
+            "启动批量爬取",
+            "监控爬取进度",
+            "验证所有关键词都已处理",
+            "检查爬取结果的组织结构"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "content-processing",
+      "name": "内容处理",
+      "description": "文章内容扩展、摘要生成和翻译",
+      "components": ["geminiService.ts"],
+      "testSteps": [
+        {
+          "scenario": "文章摘要生成",
+          "passes": false,
+          "steps": [
+            "选择一篇文章",
+            "点击'生成摘要'按钮",
+            "等待 AI 处理",
+            "验证摘要的准确性和简洁性",
+            "检查摘要是否包含关键信息"
+          ]
+        },
+        {
+          "scenario": "内容扩展",
+          "passes": false,
+          "steps": [
+            "选择一篇简短新闻",
+            "点击'扩展内容'选项",
+            "选择扩展类型（详细分析、背景信息等）",
+            "提交扩展请求",
+            "验证扩展内容的相关性和质量"
+          ]
+        },
+        {
+          "scenario": "文章翻译",
+          "passes": false,
+          "steps": [
+            "选择一篇非中文文章",
+            "点击'翻译'按钮",
+            "选择目标语言",
+            "等待翻译完成",
+            "验证翻译的准确性和流畅性",
+            "检查格式是否保持一致"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "article-management",
+      "name": "文章管理",
+      "description": "文章的查看、搜索、分类和收藏",
+      "components": ["Articles.tsx", "MyCrawls.tsx"],
+      "testSteps": [
+        {
+          "scenario": "文章列表浏览",
+          "passes": false,
+          "steps": [
+            "导航到'文章'页面",
+            "浏览文章列表",
+            "验证文章标题、来源、时间显示",
+            "测试滚动加载更多功能",
+            "检查文章分类筛选"
+          ]
+        },
+        {
+          "scenario": "文章搜索",
+          "passes": false,
+          "steps": [
+            "在文章页面输入搜索关键词",
+            "选择搜索范围（标题、内容、来源）",
+            "执行搜索",
+            "验证搜索结果的相关性",
+            "测试高级搜索选项"
+          ]
+        },
+        {
+          "scenario": "文章收藏",
+          "passes": false,
+          "steps": [
+            "选择一篇文章",
+            "点击'收藏'按钮",
+            "导航到'我的收藏'",
+            "验证文章是否在收藏列表中",
+            "测试取消收藏功能"
+          ]
+        },
+        {
+          "scenario": "文章详情查看",
+          "passes": false,
+          "steps": [
+            "点击文章标题",
+            "查看文章详情页面",
+            "验证完整内容显示",
+            "测试相关文章推荐",
+            "检查分享功能"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "subscription-management",
+      "name": "订阅管理",
+      "description": "RSS源、API和网站订阅管理",
+      "components": ["Subscriptions.tsx"],
+      "testSteps": [
+        {
+          "scenario": "添加RSS订阅",
+          "passes": false,
+          "steps": [
+            "导航到'订阅'页面",
+            "点击'添加订阅'",
+            "选择订阅类型为'RSS'",
+            "输入RSS URL",
+            "设置更新频率",
+            "保存订阅",
+            "验证订阅是否成功添加"
+          ]
+        },
+        {
+          "scenario": "订阅状态监控",
+          "passes": false,
+          "steps": [
+            "在订阅列表查看所有订阅",
+            "检查每个订阅的状态（健康/错误）",
+            "查看最后更新时间",
+            "测试刷新订阅功能",
+            "验证错误订阅的重试机制"
+          ]
+        },
+        {
+          "scenario": "批量导入订阅",
+          "passes": false,
+          "steps": [
+            "准备OPML文件",
+            "点击'导入订阅'",
+            "选择OPML文件",
+            "确认导入",
+            "验证所有订阅是否正确导入"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "analytics-dashboard",
+      "name": "分析仪表板",
+      "description": "新闻统计、趋势分析和数据可视化",
+      "components": ["Dashboard.tsx", "Analytics.tsx", "statsService.ts"],
+      "testSteps": [
+        {
+          "scenario": "仪表板概览",
+          "passes": false,
+          "steps": [
+            "登录后进入仪表板",
+            "查看关键指标卡片",
+            "验证数据实时更新",
+            "检查趋势图表",
+            "测试时间范围筛选"
+          ]
+        },
+        {
+          "scenario": "详细分析报告",
+          "passes": false,
+          "steps": [
+            "导航到'分析'页面",
+            "选择分析类型（来源分析、主题分析等）",
+            "设置分析参数",
+            "生成报告",
+            "验证图表准确性",
+            "测试导出功能"
+          ]
+        },
+        {
+          "scenario": "自定义报表",
+          "passes": false,
+          "steps": [
+            "点击'创建自定义报表'",
+            "选择数据维度",
+            "设置筛选条件",
+            "配置图表类型",
+            "保存报表模板",
+            "验证报表生成"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "notification-system",
+      "name": "通知系统",
+      "description": "实时通知、邮件提醒和推送管理",
+      "components": ["Notifications.tsx", "emailService.ts"],
+      "testSteps": [
+        {
+          "scenario": "实时通知",
+          "passes": false,
+          "steps": [
+            "触发一个事件（如爬取完成）",
+            "检查通知栏是否显示新通知",
+            "验证通知内容",
+            "测试标记已读功能",
+            "检查通知历史"
+          ]
+        },
+        {
+          "scenario": "邮件通知设置",
+          "passes": false,
+          "steps": [
+            "进入'通知设置'",
+            "配置邮件通知偏好",
+            "设置触发条件",
+            "保存设置",
+            "触发相应事件",
+            "验证是否收到邮件"
+          ]
+        },
+        {
+          "scenario": "推送通知",
+          "passes": false,
+          "steps": [
+            "允许浏览器推送通知",
+            "设置推送规则",
+            "触发推送事件",
+            "验证系统通知显示",
+            "测试点击通知跳转"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "payment-subscription",
+      "name": "支付与订阅",
+      "description": "付费计划、支付处理和订阅管理",
+      "components": ["Payment.tsx", "Pricing.tsx", "paymentService.ts", "epayService.ts"],
+      "testSteps": [
+        {
+          "scenario": "查看定价方案",
+          "passes": false,
+          "steps": [
+            "导航到'定价'页面",
+            "查看所有可用计划",
+            "对比计划功能",
+            "测试计划切换视图",
+            "检查免费试用选项"
+          ]
+        },
+        {
+          "scenario": "订阅升级",
+          "passes": false,
+          "steps": [
+            "在'定价'页面选择升级计划",
+            "点击'升级'按钮",
+            "进入支付流程",
+            "选择支付方式",
+            "输入支付信息",
+            "确认支付",
+            "验证订阅状态更新"
+          ]
+        },
+        {
+          "scenario": "支付历史查看",
+          "passes": false,
+          "steps": [
+            "进入'支付'页面",
+            "查看交易历史",
+            "验证账单详情",
+            "测试下载发票功能",
+            "检查退款状态"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "user-profile",
+      "name": "用户资料",
+      "description": "个人信息管理、偏好设置和账户安全",
+      "components": ["Profile.tsx"],
+      "testSteps": [
+        {
+          "scenario": "编辑个人资料",
+          "passes": false,
+          "steps": [
+            "导航到'个人资料'",
+            "点击'编辑资料'",
+            "修改姓名、头像等信息",
+            "保存更改",
+            "验证信息更新成功"
+          ]
+        },
+        {
+          "scenario": "偏好设置",
+          "passes": false,
+          "steps": [
+            "进入'设置'选项卡",
+            "修改语言偏好",
+            "调整时区设置",
+            "配置通知选项",
+            "保存设置",
+            "验证设置生效"
+          ]
+        },
+        {
+          "scenario": "账户安全",
+          "passes": false,
+          "steps": [
+            "进入'安全'选项卡",
+            "启用两步验证",
+            "查看登录历史",
+            "修改密码",
+            "配置API密钥",
+            "验证安全措施"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "multilingual-support",
+      "name": "多语言支持",
+      "description": "界面国际化、内容翻译和本地化",
+      "components": ["LanguageContext.tsx", "translations.ts"],
+      "testSteps": [
+        {
+          "scenario": "界面语言切换",
+          "passes": false,
+          "steps": [
+            "在顶部栏点击语言选择器",
+            "选择不同语言",
+            "验证界面文本更新",
+            "检查所有页面元素",
+            "确保RTL语言支持"
+          ]
+        },
+        {
+          "scenario": "内容语言检测",
+          "passes": false,
+          "steps": [
+            "上传多语言内容",
+            "验证自动语言检测",
+            "检查检测准确性",
+            "测试手动语言标记"
+          ]
+        },
+        {
+          "scenario": "本地化格式",
+          "passes": false,
+          "steps": [
+            "切换到不同语言环境",
+            "检查日期时间格式",
+            "验证数字和货币格式",
+            "测试时区转换"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "data-export-import",
+      "name": "数据导入导出",
+      "description": "数据备份、迁移和格式转换",
+      "components": ["Dashboard.tsx", "Analytics.tsx"],
+      "testSteps": [
+        {
+          "scenario": "导出文章数据",
+          "passes": false,
+          "steps": [
+            "进入文章管理页面",
+            "选择导出范围",
+            "选择导出格式（JSON、CSV、XML）",
+            "执行导出",
+            "验证文件完整性",
+            "测试导入功能"
+          ]
+        },
+        {
+          "scenario": "备份订阅列表",
+          "passes": false,
+          "steps": [
+            "进入订阅管理",
+            "点击'导出订阅'",
+            "选择OPML格式",
+            "下载备份文件",
+            "验证文件格式正确性"
+          ]
+        },
+        {
+          "scenario": "数据迁移",
+          "passes": false,
+          "steps": [
+            "准备迁移数据包",
+            "进入数据管理页面",
+            "上传数据包",
+            "选择迁移选项",
+            "执行迁移",
+            "验证数据完整性"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "search-functionality",
+      "name": "搜索功能",
+      "description": "全文搜索、高级搜索和搜索历史",
+      "components": ["Articles.tsx", "Crawler.tsx"],
+      "testSteps": [
+        {
+          "scenario": "基础搜索",
+          "passes": false,
+          "steps": [
+            "在搜索框输入关键词",
+            "点击搜索或按回车",
+            "查看搜索结果",
+            "验证结果相关性",
+            "检查搜索耗时"
+          ]
+        },
+        {
+          "scenario": "高级搜索",
+          "passes": false,
+          "steps": [
+            "展开高级搜索选项",
+            "设置多个筛选条件",
+            "使用布尔运算符",
+            "指定时间范围",
+            "执行搜索",
+            "验证筛选效果"
+          ]
+        },
+        {
+          "scenario": "搜索历史",
+          "passes": false,
+          "steps": [
+            "执行多次搜索",
+            "查看搜索历史列表",
+            "点击历史搜索项",
+            "清除搜索历史",
+            "验证历史管理功能"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api-integration",
+      "name": "API集成",
+      "description": "第三方API对接、Webhook和API管理",
+      "components": ["geminiService.ts", "authService.ts"],
+      "testSteps": [
+        {
+          "scenario": "Gemini API集成",
+          "passes": false,
+          "steps": [
+            "验证API密钥配置",
+            "测试新闻搜索功能",
+            "检查API响应时间",
+            "验证错误处理",
+            "测试API限流"
+          ]
+        },
+        {
+          "scenario": "iFlow API集成",
+          "passes": false,
+          "steps": [
+            "测试内容扩展功能",
+            "验证翻译API调用",
+            "检查API密钥安全性",
+            "测试备用API切换"
+          ]
+        },
+        {
+          "scenario": "Webhook配置",
+          "passes": false,
+          "steps": [
+            "配置Webhook URL",
+            "设置触发事件",
+            "测试Webhook发送",
+            "验证接收的数据格式",
+            "检查重试机制"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "performance-optimization",
+      "name": "性能优化",
+      "description": "缓存策略、懒加载和性能监控",
+      "components": ["App.tsx", "Dashboard.tsx"],
+      "testSteps": [
+        {
+          "scenario": "页面加载性能",
+          "passes": false,
+          "steps": [
+            "清除浏览器缓存",
+            "刷新页面",
+            "使用开发者工具测量加载时间",
+            "检查资源优化",
+            "验证懒加载效果"
+          ]
+        },
+        {
+          "scenario": "大数据处理",
+          "passes": false,
+          "steps": [
+            "加载大量文章数据",
+            "测试滚动性能",
+            "检查内存使用",
+            "验证分页或虚拟滚动",
+            "测试搜索性能"
+          ]
+        },
+        {
+          "scenario": "缓存策略",
+          "passes": false,
+          "steps": [
+            "首次访问页面",
+            "再次访问检查缓存",
+            "验证缓存过期机制",
+            "测试离线功能",
+            "检查缓存清理"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "multi-crawler-engine",
+      "name": "多爬虫引擎",
+      "description": "基于 Crawlee 的多爬虫并行运行系统，支持关键词搜索、URL订阅、批量爬取等功能",
+      "components": ["services/crawlerEngine.ts", "services/crawleeService.ts", "views/CrawlerManager.tsx"],
+      "setupGuide": "CRAWLEE_SETUP.md",
+      "testSteps": [
+        {
+          "scenario": "安装和配置 Crawlee 环境",
+          "passes": false,
+          "steps": [
+            "检查 Node.js 版本是否 >= 16",
+            "运行 npm install crawlee 安装基础包",
+            "运行 npm install playwright 安装 Playwright 支持",
+            "运行 npm install puppeteer 安装 Puppeteer 支持",
+            "在 package.json 中添加 'type': 'module' 配置",
+            "创建 services/crawleeService.ts 文件",
+            "验证所有依赖安装成功"
+          ]
+        },
+        {
+          "scenario": "关键词搜索爬取功能",
+          "passes": false,
+          "steps": [
+            "在爬虫界面输入搜索关键词（如：人工智能）",
+            "选择搜索引擎（Google、Bing、百度等）",
+            "配置搜索结果页数限制（如：前5页）",
+            "选择爬虫类型（静态页面用 CheerioCrawler）",
+            "点击开始搜索按钮",
+            "验证爬虫成功提取搜索结果",
+            "检查结果包含标题、链接、摘要",
+            "确认数据保存到 Supabase 数据库"
+          ]
+        },
+        {
+          "scenario": "URL订阅监控功能",
+          "passes": false,
+          "steps": [
+            "进入订阅管理页面",
+            "点击添加订阅按钮",
+            "输入要监控的URL",
+            "设置监控频率（每小时/每天/每周）",
+            "配置内容变更检测规则",
+            "选择通知方式（邮件/推送）",
+            "保存订阅配置",
+            "验证定时任务成功创建",
+            "等待下次执行检查是否正常工作"
+          ]
+        },
+        {
+          "scenario": "批量URL爬取功能",
+          "passes": false,
+          "steps": [
+            "进入批量爬取页面",
+            "上传包含URL的CSV文件",
+            "或通过文本框批量粘贴URL",
+            "点击解析并验证URL",
+            "检查无效URL是否被过滤",
+            "选择爬虫类型和并发数",
+            "点击开始批量爬取",
+            "实时查看爬取进度条",
+            "完成后下载结果报告"
+          ]
+        },
+        {
+          "scenario": "网站地图爬取功能",
+          "passes": false,
+          "steps": [
+            "输入目标网站域名（如：example.com）",
+            "点击自动发现sitemap",
+            "验证系统找到sitemap.xml",
+            "显示所有发现的页面URL",
+            "设置爬取优先级（首页优先）",
+            "配置遵守robots.txt规则",
+            "启动全站爬取",
+            "检查爬取日志确保无错误"
+          ]
+        },
+        {
+          "scenario": "多爬虫并行管理",
+          "passes": false,
+          "steps": [
+            "创建多个不同类型的爬取任务",
+            "打开爬虫管理仪表板",
+            "查看所有运行中的爬虫实例",
+            "验证显示每个爬虫的状态（运行中/暂停/完成）",
+            "测试暂停单个爬虫功能",
+            "测试恢复被暂停的爬虫",
+            "测试停止爬虫功能",
+            "验证资源使用情况显示正常"
+          ]
+        },
+        {
+          "scenario": "爬虫结果查看和导出",
+          "passes": false,
+          "steps": [
+            "进入爬取历史页面",
+            "选择一个已完成的爬取任务",
+            "查看爬取结果列表",
+            "测试按时间/来源/关键词筛选",
+            "点击查看单条详情",
+            "测试导出为CSV功能",
+            "测试导出为JSON功能",
+            "验证导出文件格式正确"
+          ]
+        },
+        {
+          "scenario": "爬虫调度和定时任务",
+          "passes": false,
+          "steps": [
+            "进入任务调度页面",
+            "创建新的定时任务",
+            "设置cron表达式（如：0 9 * * * 每天上午9点）",
+            "选择要执行的爬虫配置",
+            "配置任务参数（关键词/URL列表）",
+            "启用任务",
+            "验证任务出现在调度列表",
+            "手动触发测试执行"
+          ]
+        },
+        {
+          "scenario": "错误处理和重试机制",
+          "passes": false,
+          "steps": [
+            "故意输入无效的URL测试",
+            "验证错误信息显示清晰",
+            "检查错误日志记录完整",
+            "测试网络中断时的处理",
+            "恢复网络后验证自动重试",
+            "查看失败任务的重试历史",
+            "验证最终失败通知发送"
+          ]
+        },
+        {
+          "scenario": "爬虫性能监控",
+          "passes": false,
+          "steps": [
+            "启动一个大型爬取任务",
+            "打开性能监控面板",
+            "查看CPU和内存使用率",
+            "检查请求速率是否合规",
+            "查看平均响应时间",
+            "监控成功/失败请求比例",
+            "测试调整并发数的效果",
+            "验证性能优化建议显示"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "error-handling",
+      "name": "错误处理",
+      "description": "异常捕获、错误提示和恢复机制",
+      "components": ["App.tsx", "ErrorBoundary"],
+      "testSteps": [
+        {
+          "scenario": "网络错误处理",
+          "passes": false,
+          "steps": [
+            "断开网络连接",
+            "尝试加载内容",
+            "验证错误提示",
+            "检查重试按钮",
+            "恢复网络后测试自动重载"
+          ]
+        },
+        {
+          "scenario": "API错误处理",
+          "passes": false,
+          "steps": [
+            "使用无效API密钥",
+            "触发API调用",
+            "验证错误消息",
+            "检查错误日志",
+            "测试降级方案"
+          ]
+        },
+        {
+          "scenario": "表单验证错误",
+          "passes": false,
+          "steps": [
+            "提交空表单",
+            "输入无效邮箱",
+            "密码不匹配",
+            "验证错误提示位置",
+            "测试错误修复后状态"
+          ]
+        }
+      ]
+    }
+  ],
+  "testGuidelines": {
+    "preconditions": [
+      "确保所有环境变量已正确配置",
+      "GEMINI_API_KEY 已设置并有效",
+      "数据库连接正常",
+      "浏览器启用 JavaScript 和 Cookies"
+    ],
+    "testEnvironment": {
+      "browsers": ["Chrome", "Firefox", "Safari", "Edge"],
+      "devices": ["Desktop", "Tablet", "Mobile"],
+      "viewports": ["1920x1080", "1366x768", "768x1024", "375x667"]
+    },
+    "testData": {
+      "testUser": {
+        "email": "test@example.com",
+        "password": "Test123456!"
+      },
+      "sampleKeywords": ["technology", "AI", "climate change", "economy"],
+      "sampleLanguages": ["en", "zh", "es", "fr"]
+    }
+  },
+  "automationNotes": {
+    "recommendedTools": ["Selenium", "Playwright", "Cypress"],
+    "ciIntegration": ["GitHub Actions", "GitLab CI", "Jenkins"],
+    "coverageTarget": "80%以上",
+    "testTypes": ["单元测试", "集成测试", "E2E测试", "性能测试"]
+  }
+}

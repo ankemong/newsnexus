@@ -53,7 +53,7 @@ const Auth: React.FC<AuthProps> = ({ view, setView, onLogin }) => {
 
       if (error) {
         console.error('Edge Function error:', error);
-        setEmailError('邮件发送失败，请稍后重试');
+        setEmailError(t('auth.emailSendFailed'));
       } else if (data && data.success) {
         setEmailSent(true);
         setCountdown(60);
@@ -73,7 +73,7 @@ const Auth: React.FC<AuthProps> = ({ view, setView, onLogin }) => {
       }
     } catch (error) {
       console.error('发送验证码邮件时出错:', error);
-      setEmailError('邮件发送失败，请稍后重试');
+      setEmailError(t('auth.emailSendFailed'));
     } finally {
       setSendingCode(false);
     }
@@ -86,7 +86,7 @@ const Auth: React.FC<AuthProps> = ({ view, setView, onLogin }) => {
 
     if (!isReset) {
        if (!email) newErrors.email = t('auth.emailRequired');
-       else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = '请输入有效的邮箱地址';
+       else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = t('auth.invalidEmail');
     }
 
     if (isLogin || isRegister || isReset) {
@@ -102,8 +102,12 @@ const Auth: React.FC<AuthProps> = ({ view, setView, onLogin }) => {
     if (isRegister) {
         if (!verificationCode) {
           newErrors.verification = t('auth.captchaError');
+        } else {
+          // 验证验证码格式
+          if (!/^\d{6}$/.test(verificationCode)) {
+            newErrors.verification = '请输入6位数字验证码';
+          }
         }
-        // 验证码验证将在提交时通过 Edge Function 进行
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -128,14 +132,54 @@ const Auth: React.FC<AuthProps> = ({ view, setView, onLogin }) => {
                 onLogin();
             }
         } else if (isRegister) {
-            // 真实的注册验证
-            const { user, error } = await AuthService.signUp(email, password, email.split('@')[0]);
+            // 先检查邮箱是否已注册
+            try {
+                const { supabase } = await import('../lib/supabaseClient');
+                const { data: existingUser } = await supabase
+                    .from('users')
+                    .select('email')
+                    .eq('email', email)
+                    .single();
 
-            if (error) {
-                setAuthError(error);
-            } else if (user) {
-                // 注册成功，自动登录
-                onLogin();
+                if (existingUser) {
+                    setAuthError('该邮箱已被注册，请直接登录');
+                    return;
+                }
+
+                // 验证验证码
+                const verifyResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-code`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+                    },
+                    body: JSON.stringify({ email, code: verificationCode }),
+                });
+
+                const verifyData = await verifyResponse.json();
+
+                if (!verifyData.success) {
+                    setAuthError(verifyData.error || '验证码验证失败');
+                    return;
+                }
+
+                // 验证码通过，进行注册
+                const { user, error } = await AuthService.signUp(email, password, email.split('@')[0]);
+
+                if (error) {
+                    // 检查是否是重复注册错误
+                    if (error.includes('already registered') || error.includes('already been registered') || error.includes('User already registered')) {
+                        setAuthError('该邮箱已被注册，请直接登录');
+                    } else {
+                        setAuthError(error);
+                    }
+                } else if (user) {
+                    // 注册成功，自动登录
+                    onLogin();
+                }
+            } catch (error) {
+                console.error('注册错误:', error);
+                setAuthError('注册失败，请稍后重试');
             }
         } else if (isReset) {
             // 重置密码

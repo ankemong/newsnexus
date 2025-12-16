@@ -82,6 +82,18 @@ interface TranslationStructure {
     or: string;
     google: string;
     wechat: string;
+    emailSendFailed: string;
+    invalidEmail: string;
+    passwordTooShort: string;
+    verificationCodeFormat: string;
+    emailAlreadyRegistered: string;
+    verificationFailed: string;
+    registrationFailed: string;
+    operationFailed: string;
+    codeSentToEmail: string;
+    codeValidFor: string;
+    sending: string;
+    processing: string;
   };
   crawler: {
     title: string;
@@ -307,7 +319,19 @@ const en: TranslationStructure = {
     developerLogin: 'Developer Quick Login',
     or: 'Or continue with',
     google: 'Google',
-    wechat: 'WeChat'
+    wechat: 'WeChat',
+    emailSendFailed: 'Failed to send email, please try again',
+    invalidEmail: 'Please enter a valid email address',
+    passwordTooShort: 'Password must be at least 6 characters',
+    verificationCodeFormat: 'Please enter 6-digit verification code',
+    emailAlreadyRegistered: 'This email is already registered, please login',
+    verificationFailed: 'Verification failed, please try again',
+    registrationFailed: 'Registration failed, please try again later',
+    operationFailed: 'Operation failed, please try again',
+    codeSentToEmail: 'Verification code has been sent to your email',
+    codeValidFor: 'Verification code is valid for 10 minutes',
+    sending: 'Sending',
+    processing: 'Processing'
   },
   crawler: {
     title: 'Keyword Subscription',
@@ -540,7 +564,19 @@ const zh: TranslationStructure = {
     developerLogin: '开发者一键登录',
     or: '或通过以下方式继续',
     google: 'Google',
-    wechat: '微信'
+    wechat: '微信',
+    emailSendFailed: '邮件发送失败，请稍后重试',
+    invalidEmail: '请输入有效的邮箱地址',
+    passwordTooShort: '密码至少需要6个字符',
+    verificationCodeFormat: '请输入6位数字验证码',
+    emailAlreadyRegistered: '该邮箱已被注册，请直接登录',
+    verificationFailed: '验证码验证失败，请重试',
+    registrationFailed: '注册失败，请稍后重试',
+    operationFailed: '操作失败，请稍后重试',
+    codeSentToEmail: '验证码已发送到您的邮箱，请查收邮件并输入验证码',
+    codeValidFor: '验证码有效期为10分钟',
+    sending: '发送中',
+    processing: '处理中'
   },
   crawler: {
     title: '关键词订阅',

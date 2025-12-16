@@ -146,3 +146,6 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ### 日志查看
 - 开发环境：控制台会显示详细的错误信息
 - 生产环境：使用浏览器开发者工具查看控制台日志
+
+在每次运行后更新progress.md,并在实现每个功能后进行测试，最重要的做法
+是提交到git，最后Claude除了标记功能已实现外不应更改功能列表
