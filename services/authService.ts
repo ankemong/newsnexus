@@ -50,23 +50,7 @@ export class AuthService {
   // 注册（需要验证码）
   static async signUp(email: string, password: string, verificationCode: string, username?: string): Promise<{ user: AuthUser | null; error: string | null }> {
     try {
-      // 首先验证验证码
-      const verifyResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-code`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({ email, code: verificationCode }),
-      });
-
-      const verifyData = await verifyResponse.json();
-
-      if (!verifyData.success) {
-        return { user: null, error: verifyData.error || '验证码验证失败' };
-      }
-
-      // 验证码通过，进行注册
+      // 验证码已在Auth.tsx中验证过，直接进行注册
       const { data, error } = await supabase.auth.signUp({
         email,
         password,

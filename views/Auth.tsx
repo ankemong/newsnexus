@@ -48,32 +48,37 @@ const Auth: React.FC<AuthProps> = ({ view, setView, onLogin }) => {
     setSendingCode(true);
 
     try {
-      // Call Edge Function to send verification email
-      const { data, error } = await emailService.sendVerificationEmail(email);
+      // 使用本地代理服务器发送验证码
+      const response = await fetch('http://localhost:3006/api/send-verification-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
 
-      if (error) {
-        console.error('Edge Function error:', error);
-        setEmailError(error.message || t('auth.emailSendFailed'));
-      } else if (data && data.success) {
-        setEmailSent(true);
-        setCountdown(60);
+      const data = await response.json();
 
-        // Start countdown
-        const timer = setInterval(() => {
-          setCountdown((prev) => {
-            if (prev <= 1) {
-              clearInterval(timer);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-      } else {
-        setEmailError(data?.error || '邮件发送失败，请稍后重试');
+      if (!response.ok) {
+        throw new Error(data.error || '发送验证码失败');
       }
-    } catch (error) {
+
+      setEmailSent(true);
+      setCountdown(60);
+
+      // Start countdown
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (error: any) {
       console.error('发送验证码邮件时出错:', error);
-      setEmailError(t('auth.emailSendFailed'));
+      setEmailError(error.message || '邮件发送失败，请稍后重试');
     } finally {
       setSendingCode(false);
     }
@@ -147,11 +152,10 @@ const Auth: React.FC<AuthProps> = ({ view, setView, onLogin }) => {
                 }
 
                 // 验证验证码
-                const verifyResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-code`, {
+                const verifyResponse = await fetch('http://localhost:3006/api/verify-code', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
                     },
                     body: JSON.stringify({ email, code: verificationCode }),
                 });
