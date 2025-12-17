@@ -53,7 +53,48 @@ const Auth: React.FC<AuthProps> = ({ view, setView, onLogin }) => {
 
       if (error) {
         console.error('Edge Function error:', error);
-        setEmailError(t('auth.emailSendFailed'));
+
+        // 如果Edge Function失败，使用本地模拟验证码（仅用于测试）
+        if (import.meta.env.DEV) {
+          const code = Math.floor(100000 + Math.random() * 900000).toString();
+          console.log('测试验证码:', code);
+
+          // 存储到本地数据库
+          const { supabase } = await import('../lib/supabaseClient');
+          const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+          const { error: insertError } = await supabase
+            .from('verification_codes')
+            .insert({
+              email: email.toLowerCase(),
+              code,
+              purpose: 'registration',
+              expires_at: expiresAt.toISOString()
+            });
+
+          if (insertError) {
+            console.error('插入验证码失败:', insertError);
+            setEmailError('验证码生成失败，请稍后重试');
+          } else {
+            setEmailSent(true);
+            setCountdown(60);
+
+            // Start countdown
+            const timer = setInterval(() => {
+              setCountdown((prev) => {
+                if (prev <= 1) {
+                  clearInterval(timer);
+                  return 0;
+                }
+                return prev - 1;
+              });
+            }, 1000);
+
+            setEmailError(`测试模式：验证码已显示在控制台中（${code}）`);
+          }
+        } else {
+          setEmailError(t('auth.emailSendFailed'));
+        }
       } else if (data && data.success) {
         setEmailSent(true);
         setCountdown(60);
@@ -164,7 +205,7 @@ const Auth: React.FC<AuthProps> = ({ view, setView, onLogin }) => {
                 }
 
                 // 验证码通过，进行注册
-                const { user, error } = await AuthService.signUp(email, password, email.split('@')[0]);
+                const { user, error } = await AuthService.signUp(email, password, verificationCode, email.split('@')[0]);
 
                 if (error) {
                     // 检查是否是重复注册错误

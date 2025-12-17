@@ -149,3 +149,7 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 在每次运行后更新progress.md,并在实现每个功能后进行测试，最重要的做法
 是提交到git，最后Claude除了标记功能已实现外不应更改功能列表
+测试使用Chrome mcp测试，不要生成测试代码文件，和将设计模式设置为模拟或开发环境，
+代码中不许出现emoji，数据库使用的是supabase，需要时可以调用supabase mcp
+
+真实邮箱账号为2847999405@qq.com 密码为18224822150x
