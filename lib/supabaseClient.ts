@@ -67,6 +67,7 @@ export const emailService = {
   // 发送验证码邮件
   sendVerificationEmail: async (email: string) => {
     try {
+      // 优先尝试使用 Edge Function
       const response = await fetch(
         `${EDGE_FUNCTIONS_BASE_URL}/send-verification-email`,
         {
@@ -79,22 +80,38 @@ export const emailService = {
         }
       );
 
-      const data = await response.json();
-      return { data, error: response.ok ? null : data };
+      if (response.ok) {
+        const data = await response.json();
+        return { data, error: null };
+      }
+
+      // 如果 Edge Function 失败，使用备用方案
+      console.warn('Edge Function failed, using fallback method');
+      const { sendVerificationEmail: fallbackSend } = await import('../email-service.js');
+      return await fallbackSend(email);
     } catch (error) {
       console.error('Error calling send-verification-email function:', error);
-      return {
-        data: null,
-        error: {
-          message: error instanceof Error ? error.message : 'Unknown error',
-        },
-      };
+
+      // 使用备用方案
+      try {
+        const { sendVerificationEmail: fallbackSend } = await import('../email-service.js');
+        return await fallbackSend(email);
+      } catch (fallbackError) {
+        console.error('Fallback method also failed:', fallbackError);
+        return {
+          data: null,
+          error: {
+            message: error instanceof Error ? error.message : 'Unknown error',
+          },
+        };
+      }
     }
   },
 
   // 验证验证码
   verifyCode: async (email: string, code: string) => {
     try {
+      // 优先尝试使用 Edge Function
       const response = await fetch(
         `${EDGE_FUNCTIONS_BASE_URL}/verify-code`,
         {
@@ -107,16 +124,82 @@ export const emailService = {
         }
       );
 
-      const data = await response.json();
-      return { data, error: response.ok ? null : data };
-    } catch (error) {
-      console.error('Error calling verify-code function:', error);
+      if (response.ok) {
+        const data = await response.json();
+        return { data, error: null };
+      }
+
+      // 如果 Edge Function 失败，直接查询数据库
+      console.warn('Edge Function failed, verifying directly from database');
+      const { data: verificationRecord } = await supabase
+        .from('verification_codes')
+        .select('*')
+        .eq('email', email.toLowerCase())
+        .eq('code', code)
+        .eq('used', false)
+        .gt('expires_at', new Date().toISOString())
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (!verificationRecord) {
+        return {
+          data: { success: false, error: '验证码无效或已过期' },
+          error: null
+        };
+      }
+
+      // 标记为已使用
+      await supabase
+        .from('verification_codes')
+        .update({ used: true, used_at: new Date().toISOString() })
+        .eq('id', verificationRecord.id);
+
       return {
-        data: null,
-        error: {
-          message: error instanceof Error ? error.message : 'Unknown error',
-        },
+        data: { success: true, message: '验证成功' },
+        error: null
       };
+    } catch (error) {
+      console.error('Error in verifyCode:', error);
+
+      // 直接查询数据库作为备用方案
+      try {
+        const { data: verificationRecord } = await supabase
+          .from('verification_codes')
+          .select('*')
+          .eq('email', email.toLowerCase())
+          .eq('code', code)
+          .eq('used', false)
+          .gt('expires_at', new Date().toISOString())
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (!verificationRecord) {
+          return {
+            data: { success: false, error: '验证码无效或已过期' },
+            error: null
+          };
+        }
+
+        // 标记为已使用
+        await supabase
+          .from('verification_codes')
+          .update({ used: true, used_at: new Date().toISOString() })
+          .eq('id', verificationRecord.id);
+
+        return {
+          data: { success: true, message: '验证成功' },
+          error: null
+        };
+      } catch (dbError) {
+        return {
+          data: null,
+          error: {
+            message: error instanceof Error ? error.message : 'Unknown error',
+          },
+        };
+      }
     }
   },
 
