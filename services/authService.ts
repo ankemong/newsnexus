@@ -57,7 +57,8 @@ export class AuthService {
         options: {
           data: {
             username: username || email.split('@')[0],
-          }
+          },
+          emailRedirectTo: undefined, // 禁用邮箱验证重定向
         }
       });
 
@@ -66,18 +67,40 @@ export class AuthService {
         return { user: null, error: error.message };
       }
 
-      if (data.user) {
-        // 创建用户资料记录
+      if (data.user && data.user.id) {
+        // 通过 RPC 调用更新邮箱确认状态
+        const { error: confirmError } = await supabase.rpc('confirm_user_email', {
+          user_id: data.user.id
+        });
+
+        if (confirmError) {
+          console.error('Error confirming email via RPC:', confirmError);
+        }
+
+        // 创建或更新用户资料记录
         const { error: profileError } = await supabase
           .from('users')
-          .insert({
+          .upsert({
             id: data.user.id,
             email: data.user.email || '',
             username: username || email.split('@')[0],
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'id'
           });
 
         if (profileError) {
           console.error('Profile creation error:', profileError);
+        }
+
+        // 注册后立即登录
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (signInError) {
+          console.error('Auto sign-in error:', signInError);
         }
 
         const user: AuthUser = {
