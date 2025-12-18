@@ -11,6 +11,8 @@ export class AuthService {
   // 登录
   static async signIn(email: string, password: string): Promise<{ user: AuthUser | null; error: string | null }> {
     try {
+      console.log('Attempting login for email:', email);
+
       // 使用 Supabase Auth 进行登录
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -19,31 +21,56 @@ export class AuthService {
 
       if (error) {
         console.error('Login error:', error);
+        console.error('Error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
+
+        // 提供更友好的错误信息
+        if (error.message === 'Invalid login credentials') {
+          return { user: null, error: '邮箱或密码错误，请检查后重试' };
+        }
+
         return { user: null, error: error.message };
       }
 
       if (data.user) {
+        console.log('Login successful, user ID:', data.user.id);
+
         // 获取用户资料信息
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('users')
           .select('*')
           .eq('id', data.user.id)
           .single();
 
+        if (profileError) {
+          console.error('Error fetching user profile:', profileError);
+          // 即使获取 profile 失败，也返回基本用户信息
+          const user: AuthUser = {
+            id: data.user.id,
+            email: data.user.email || '',
+            username: data.user.user_metadata?.username || email.split('@')[0],
+          };
+          return { user, error: null };
+        }
+
         const user: AuthUser = {
           id: data.user.id,
           email: data.user.email || '',
-          username: profile?.username,
+          username: profile?.username || data.user.user_metadata?.username || email.split('@')[0],
           avatar_url: profile?.avatar_url,
         };
 
+        console.log('User profile loaded:', user);
         return { user, error: null };
       }
 
-      return { user: null, error: '登录失败' };
+      return { user: null, error: '登录失败：未找到用户' };
     } catch (error) {
       console.error('Unexpected error during login:', error);
-      return { user: null, error: '登录时发生错误' };
+      return { user: null, error: '登录时发生错误，请稍后重试' };
     }
   }
 
