@@ -240,7 +240,7 @@ export const sendWelcomeEmail = async (
   `;
 
   return sendEmail({
-    from: 'NewsNexus <welcome@veyronix.asia>',
+    from: 'NewsNexus <hi@veyronix.asia>',
     to: recipientEmail,
     subject: '欢迎加入 NewsNexus！',
     html: htmlContent,
@@ -338,7 +338,7 @@ export const sendPasswordResetEmail = async (
   `;
 
   return sendEmail({
-    from: 'NewsNexus <security@veyronix.asia>',
+    from: 'NewsNexus <hi@veyronix.asia>',
     to: recipientEmail,
     subject: '重置您的 NewsNexus 密码',
     html: htmlContent,

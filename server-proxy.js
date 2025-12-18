@@ -68,63 +68,40 @@ app.post('/api/send-verification-email', async (req, res) => {
       return res.status(500).json({ error: 'Failed to generate verification code' });
     }
 
-    // 发送邮件
+    // 发送邮件 - 使用纯文本避免垃圾邮件过滤
     const { data, error } = await resend.emails.send({
-      from: 'NewsNexus <noreply@veyronix.asia>',
+      from: 'NewsNexus <hi@veyronix.asia>',
       to: [email],
-      subject: 'NewsNexus - 验证码',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #000; margin: 0; font-size: 28px;">NewsNexus</h1>
-            <p style="color: #666; margin: 5px 0 0; font-size: 14px;">全球新闻聚合平台</p>
-          </div>
+      subject: 'NewsNexus验证码',
+      text: `NewsNexus 邮箱验证码
 
-          <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">邮箱验证码</h2>
+验证码：${code}
 
-          <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
-            您好！您正在注册 NewsNexus 账户，请使用以下验证码完成注册：
-          </p>
+此验证码10分钟内有效。
 
-          <div style="background: #f8f9fa; border: 2px solid #e9ecef; padding: 30px; text-align: center; margin: 30px 0; border-radius: 8px;">
-            <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #007bff; font-family: monospace;">${code}</span>
-          </div>
+如果这不是您的操作，请忽略此邮件。
 
-          <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; margin: 20px 0; border-radius: 5px;">
-            <p style="margin: 0; color: #856404; font-size: 14px;">
-              <strong>重要提示：</strong><br>
-              • 验证码有效期为 <strong>10 分钟</strong><br>
-              • 请勿将验证码泄露给他人<br>
-              • 如果这不是您的操作，请忽略此邮件
-            </p>
-          </div>
-
-          <hr style="border: none; border-top: 1px solid #dee2e6; margin: 40px 0;">
-
-          <div style="color: #6c757d; font-size: 12px; text-align: center;">
-            <p style="margin: 0 0 10px;">
-              此邮件由 NewsNexus 系统自动发送，请勿回复。
-            </p>
-            <p style="margin: 0;">
-              如需帮助，请联系我们：<a href="mailto:support@veyronix.asia" style="color: #007bff;">support@veyronix.asia</a>
-            </p>
-            <p style="margin: 10px 0 0;">
-              © 2024 NewsNexus. All rights reserved.
-            </p>
-          </div>
-        </div>
-      `,
+---
+NewsNexus
+全球新闻聚合平台
+support@veyronix.asia`
     });
 
     if (error) {
-      console.error('Error sending email:', error);
-      // 清理验证码
+      console.error('Error sending email via Resend:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
+
+      // 删除已插入的验证码记录，因为邮件发送失败
       await supabase
         .from('verification_codes')
         .delete()
         .eq('email', email.toLowerCase())
         .eq('code', code);
-      return res.status(500).json({ error: 'Failed to send verification email' });
+
+      return res.status(500).json({
+        error: 'Failed to send verification email',
+        details: error.message
+      });
     }
 
     console.log('Email sent successfully to:', email);
@@ -132,8 +109,7 @@ app.post('/api/send-verification-email', async (req, res) => {
     res.json({
       success: true,
       message: '验证码已发送',
-      expiresAt: expiresAt.toISOString(),
-      code: code // 仅用于调试
+      expiresAt: expiresAt.toISOString()
     });
   } catch (error) {
     console.error('Error in /api/send-verification-email:', error);

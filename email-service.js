@@ -12,7 +12,7 @@ export async function sendVerificationEmail(email) {
 
     // 发送邮件
     const { data, error } = await resend.emails.send({
-      from: 'NewsNexus <noreply@veyronix.asia>',
+      from: 'NewsNexus <hi@veyronix.asia>',
       to: [email],
       subject: 'NewsNexus - 验证码',
       html: `
