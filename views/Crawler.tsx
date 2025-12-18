@@ -5,6 +5,7 @@ import { Article, Language, LANGUAGE_LABELS } from '../types';
 import { crawlNewsByKeyword, expandArticleContent } from '../services/geminiService';
 import { LineChart, Line, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../contexts/LanguageContext';
+import { REGION_MAP, REGION_LABELS, DEFAULT_REGION, RegionKey } from '../config/regions';
 
 const trendData = [
   { day: 'Mon', mentions: 45 },
@@ -15,16 +16,6 @@ const trendData = [
   { day: 'Sat', mentions: 59 },
   { day: 'Sun', mentions: 72 },
 ];
-
-type RegionKey = 'Global' | 'East Asia' | 'Europe' | 'Americas' | 'Middle East';
-
-const REGION_MAP: Record<RegionKey, Language[]> = {
-    'Global': [Language.English, Language.Chinese, Language.Spanish, Language.French, Language.German, Language.Japanese, Language.Arabic],
-    'East Asia': [Language.Chinese, Language.TraditionalChinese, Language.Japanese, Language.Korean, Language.Vietnamese],
-    'Europe': [Language.English, Language.French, Language.German, Language.Spanish, Language.Italian, Language.Russian],
-    'Americas': [Language.English, Language.Spanish, Language.Portuguese],
-    'Middle East': [Language.Arabic, Language.Turkish, Language.English]
-};
 
 interface SubscriptionTask {
     id: string;
@@ -42,7 +33,7 @@ const Crawler: React.FC = () => {
   
   // Input State
   const [keyword, setKeyword] = useState('');
-  const [selectedRegion, setSelectedRegion] = useState<RegionKey>('Global');
+  const [selectedRegion, setSelectedRegion] = useState<RegionKey>(DEFAULT_REGION);
   
   // Persistent State
   const [tasks, setTasks] = useState<SubscriptionTask[]>(() => {
@@ -247,8 +238,8 @@ const Crawler: React.FC = () => {
                             onChange={(e) => setSelectedRegion(e.target.value as RegionKey)}
                             className="w-full pl-10 pr-8 py-3 border border-gray-200 bg-gray-50 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none appearance-none cursor-pointer text-sm font-medium focus:bg-white"
                         >
-                            {Object.keys(REGION_MAP).map((region) => (
-                                <option key={region} value={region}>{region}</option>
+                            {Object.entries(REGION_LABELS).map(([value, label]) => (
+                                <option key={value} value={value}>{label}</option>
                             ))}
                         </select>
                         <ChevronDown className="absolute right-3 top-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
