@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Language } from '../types';
 import { resources } from '../translations';
 
@@ -9,10 +9,62 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
+const LANGUAGE_STORAGE_KEY = 'newsnexus-language';
+
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>(Language.English);
+  // 从本地存储初始化语言设置
+  const getStoredLanguage = (): Language => {
+    try {
+      const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+      if (stored && Object.values(Language).includes(stored as Language)) {
+        return stored as Language;
+      }
+    } catch (error) {
+      console.warn('Failed to read language from localStorage:', error);
+    }
+    // 回退到浏览器语言或英语
+    const browserLang = navigator.language;
+    if (browserLang.startsWith('zh')) {
+      return browserLang.includes('TW') || browserLang.includes('HK') ? Language.TraditionalChinese : Language.Chinese;
+    }
+    if (browserLang.startsWith('es')) return Language.Spanish;
+    if (browserLang.startsWith('fr')) return Language.French;
+    if (browserLang.startsWith('de')) return Language.German;
+    if (browserLang.startsWith('ja')) return Language.Japanese;
+    if (browserLang.startsWith('ru')) return Language.Russian;
+    if (browserLang.startsWith('pt')) return Language.Portuguese;
+    if (browserLang.startsWith('ar')) return Language.Arabic;
+    if (browserLang.startsWith('hi')) return Language.Hindi;
+    if (browserLang.startsWith('it')) return Language.Italian;
+    if (browserLang.startsWith('ko')) return Language.Korean;
+    if (browserLang.startsWith('tr')) return Language.Turkish;
+    if (browserLang.startsWith('nl')) return Language.Dutch;
+    if (browserLang.startsWith('pl')) return Language.Polish;
+    if (browserLang.startsWith('id')) return Language.Indonesian;
+    if (browserLang.startsWith('vi')) return Language.Vietnamese;
+    if (browserLang.startsWith('th')) return Language.Thai;
+
+    return Language.English;
+  };
+
+  const [language, setLanguageState] = useState<Language>(getStoredLanguage);
+
+  // 包装 setLanguage 以添加本地存储
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    try {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+    } catch (error) {
+      console.warn('Failed to save language to localStorage:', error);
+    }
+  };
+
+  // 更新 HTML 文档的 lang 属性
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const t = (path: string): string => {
     const keys = path.split('.');
@@ -25,7 +77,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
       } else {
         current = undefined;
       }
-      
+
       if (fallback && fallback[key] !== undefined) {
         fallback = fallback[key];
       } else {

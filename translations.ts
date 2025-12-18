@@ -29,6 +29,8 @@ interface TranslationStructure {
     fri: string;
     sat: string;
     sun: string;
+    switchLanguage: string;
+    selectLanguage: string;
   };
   dashboard: {
     totalArticles: string;
@@ -266,7 +268,9 @@ const en: TranslationStructure = {
     thu: 'Thu',
     fri: 'Fri',
     sat: 'Sat',
-    sun: 'Sun'
+    sun: 'Sun',
+    switchLanguage: 'Switch Language',
+    selectLanguage: 'Select Language'
   },
   dashboard: {
     totalArticles: 'Total Articles',
@@ -511,7 +515,9 @@ const zh: TranslationStructure = {
     thu: '周四',
     fri: '周五',
     sat: '周六',
-    sun: '周日'
+    sun: '周日',
+    switchLanguage: '切换语言',
+    selectLanguage: '选择语言'
   },
   dashboard: {
     totalArticles: '文章总数',

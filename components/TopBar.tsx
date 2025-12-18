@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Bell, Search, User as UserIcon, Globe, Check } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Language, LANGUAGE_LABELS } from '../types';
@@ -14,11 +14,42 @@ interface TopBarProps {
 const TopBar: React.FC<TopBarProps> = ({ onMenuClick, title, onNotificationClick, onProfileClick }) => {
   const { t, language: currentLang, setLanguage: setLang } = useLanguage();
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement>(null);
+  const langButtonRef = useRef<HTMLButtonElement>(null);
 
   // Sort languages alphabetically
-  const sortedLanguages = Object.values(Language).sort((a, b) => 
+  const sortedLanguages = Object.values(Language).sort((a, b) =>
     LANGUAGE_LABELS[a].localeCompare(LANGUAGE_LABELS[b])
   );
+
+  // Handle click outside to close menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) {
+        setIsLangMenuOpen(false);
+      }
+    };
+
+    if (isLangMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isLangMenuOpen]);
+
+  // Handle escape key to close menu
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isLangMenuOpen) {
+        setIsLangMenuOpen(false);
+        langButtonRef.current?.focus();
+      }
+    };
+
+    if (isLangMenuOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isLangMenuOpen]);
   
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10 px-6 py-3 flex items-center justify-between shadow-sm">
@@ -35,43 +66,49 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick, title, onNotificationClick
       <div className="flex items-center space-x-4">
         
         {/* Language Switcher */}
-        <div className="relative">
-            <button 
+        <div className="relative" ref={langMenuRef}>
+            <button
+              ref={langButtonRef}
               onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-              className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors flex items-center gap-1"
-              title="Switch Language"
+              className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-black"
+              title={t('common.switchLanguage')}
+              aria-label={t('common.switchLanguage')}
+              aria-expanded={isLangMenuOpen}
+              aria-haspopup="menu"
             >
               <Globe className="w-5 h-5" />
               <span className="text-xs font-medium uppercase hidden md:block text-gray-500">
                 {currentLang === Language.TraditionalChinese ? 'TC' : currentLang.toUpperCase()}
               </span>
             </button>
-            
+
             {isLangMenuOpen && (
-              <>
-                <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => setIsLangMenuOpen(false)}
-                />
-                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 py-1 max-h-[400px] overflow-y-auto z-50 scrollbar-hide animate-in fade-in zoom-in-95 duration-100">
-                  <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Select Language</div>
-                  {sortedLanguages.map((lang) => (
-                    <button
-                      key={lang}
-                      onClick={() => {
-                        setLang(lang);
-                        setIsLangMenuOpen(false);
-                      }}
-                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between
-                        ${currentLang === lang ? 'text-black font-semibold bg-gray-50' : 'text-gray-600'}
-                      `}
-                    >
-                      <span>{LANGUAGE_LABELS[lang]}</span>
-                      {currentLang === lang && <Check className="w-3 h-3" />}
-                    </button>
-                  ))}
+              <div
+                className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 py-1 max-h-[400px] overflow-y-auto z-50 scrollbar-hide animate-in fade-in zoom-in-95 duration-100"
+                role="menu"
+                aria-labelledby="language-button"
+              >
+                <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  {t('common.selectLanguage')}
                 </div>
-              </>
+                {sortedLanguages.map((lang, index) => (
+                  <button
+                    key={lang}
+                    onClick={() => {
+                      setLang(lang);
+                      setIsLangMenuOpen(false);
+                      langButtonRef.current?.focus();
+                    }}
+                    role="menuitem"
+                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between focus:outline-none focus:bg-gray-50
+                      ${currentLang === lang ? 'text-black font-semibold bg-gray-50' : 'text-gray-600'}
+                    `}
+                  >
+                    <span>{LANGUAGE_LABELS[lang]}</span>
+                    {currentLang === lang && <Check className="w-3 h-3 text-black" />}
+                  </button>
+                ))}
+              </div>
             )}
         </div>
 

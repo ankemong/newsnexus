@@ -70,6 +70,19 @@
    - 添加登录状态持久化
    - 改进错误提示信息
 
+### 5. 地区选择配置优化
+
+**修复内容**：
+- ✅ 解决了 "Select Region is hardcoded" 问题
+- ✅ 创建 config/regions.ts 配置文件
+- ✅ 将硬编码的地区列表改为从配置文件读取
+- ✅ 支持9个地区：Global、East Asia、Europe、Americas、Middle East、South Asia、Southeast Asia、Oceania、Africa
+- ✅ 每个地区配置了相应的语言映射
+
+**测试结果**：
+- 地区选择下拉框正常显示所有配置的地区
+- 功能已通过 Chrome MCP 测试验证
+
 ## 功能状态
 
 - ✅ 邮箱验证系统正常工作
@@ -79,6 +92,7 @@
 - ⚠️ 登录功能需要进一步调试
 - ❌ Gemini API 密钥待配置
 - ❌ 爬虫功能待测试
+- ✅ 地区选择硬编码问题已修复
 
 ---
 更新时间：2025-12-18
