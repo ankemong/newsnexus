@@ -1,4 +1,30 @@
 
+export type ViewState =
+  | 'home'
+  | 'login'
+  | 'register'
+  | 'forgot-password'
+  | 'reset-password'
+  | 'dashboard'
+  | 'subscriptions'
+  | 'notifications'
+  | 'payment'
+  | 'profile'
+  // Info pages
+  | 'docs'
+  | 'blog'
+  | 'community'
+  | 'help'
+  | 'privacy'
+  | 'terms'
+  | 'cookie-policy'
+  | 'contact'
+  // legacy/compat (guarded in App.tsx)
+  | 'analytics'
+  | 'articles'
+  | 'article-detail'
+  | 'crawler';
+
 export enum Language {
   English = 'en',
   Chinese = 'zh',
