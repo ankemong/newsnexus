@@ -45,7 +45,7 @@ const crawlWithBocha = async (keyword: string, languages: Language[]): Promise<A
 
     const articles: Article[] = response.data.webPages.value
       .filter((result: any) => result.snippet && result.snippet.length > 50)
-      .slice(0, 5)
+      .slice(0, 10)
       .map((result: any, index: number) => ({
         id: `bocha-${Date.now()}-${index}`,
         title: result.name || result.title || '无标题',
