@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { Globe, Plus, Search, ExternalLink, Trash2, Edit2, Check, X, Clock, AlertCircle, RefreshCw, FileText, Download, Calendar } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-
-interface CrawledContent {
-  id: string;
-  title: string;
-  url: string;
-  content: string;
-  publishedAt: string;
-  crawledAt: string;
-}
+import { WebsiteCrawlerService, CrawledContent } from '../services/websiteCrawlerService';
 
 interface UrlSubscription {
   id: string;
@@ -24,6 +16,7 @@ interface UrlSubscription {
 }
 
 const UrlSubscriptions: React.FC = () => {
+  const [crawlerService] = useState(() => new WebsiteCrawlerService());
   const [subscriptions, setSubscriptions] = useState<UrlSubscription[]>([
     {
       id: '1',
@@ -74,25 +67,38 @@ const UrlSubscriptions: React.FC = () => {
 
     setIsSearching(true);
     try {
-      // 模拟URL分析和发现
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // 检查网站是否支持爬取
+      const supportCheck = await crawlerService.checkWebsiteSupport(searchUrl);
 
-      const mockResults = [
-        {
-          title: '发现网站内容',
-          description: '可以爬取此网站的内容更新',
+      if (supportCheck.supported) {
+        console.log(`网站 ${searchUrl} 支持爬取，建议类型: ${supportCheck.suggestedType}`);
+
+        setNewSubscription({
+          name: new URL(searchUrl).hostname.replace('www.', ''),
+          url: searchUrl,
+          type: supportCheck.suggestedType as 'RSS' | 'Website' | 'API'
+        });
+      } else {
+        console.warn(`网站 ${searchUrl} 不支持爬取: ${supportCheck.reason}`);
+        // 仍然允许添加，但标记为可能有问题
+        setNewSubscription({
+          name: new URL(searchUrl).hostname.replace('www.', ''),
           url: searchUrl,
           type: 'Website'
-        }
-      ];
-
-      setNewSubscription({
-        name: new URL(searchUrl).hostname,
-        url: searchUrl,
-        type: 'Website'
-      });
+        });
+      }
     } catch (error) {
-      console.error('搜索失败:', error);
+      console.error('URL分析失败:', error);
+      // 如果分析失败，仍然允许用户手动添加
+      try {
+        setNewSubscription({
+          name: new URL(searchUrl).hostname.replace('www.', ''),
+          url: searchUrl,
+          type: 'Website'
+        });
+      } catch (e) {
+        console.error('URL格式错误:', e);
+      }
     } finally {
       setIsSearching(false);
     }
@@ -108,50 +114,47 @@ const UrlSubscriptions: React.FC = () => {
     ));
 
     try {
-      // 模拟爬取过程
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      const subscription = subscriptions.find(sub => sub.id === subscriptionId);
+      if (!subscription) {
+        throw new Error('订阅不存在');
+      }
 
-      // 生成模拟的爬取内容
-      const mockContents: CrawledContent[] = [
-        {
-          id: `${subscriptionId}-${Date.now()}-1`,
-          title: '最新文章标题 1',
-          url: `https://example.com/article/1`,
-          content: '这是第一篇爬取到的文章内容摘要...',
-          publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5天前
-          crawledAt: new Date().toISOString()
-        },
-        {
-          id: `${subscriptionId}-${Date.now()}-2`,
-          title: '最新文章标题 2',
-          url: `https://example.com/article/2`,
-          content: '这是第二篇爬取到的文章内容摘要...',
-          publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(), // 10天前
-          crawledAt: new Date().toISOString()
-        },
-        {
-          id: `${subscriptionId}-${Date.now()}-3`,
-          title: '最新文章标题 3',
-          url: `https://example.com/article/3`,
-          content: '这是第三篇爬取到的文章内容摘要...',
-          publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 20).toISOString(), // 20天前
-          crawledAt: new Date().toISOString()
-        }
-      ];
+      console.log(`开始爬取 ${subscription.name} (${subscription.url}) 的内容...`);
 
-      // 更新订阅内容
-      setSubscriptions(prev => prev.map(sub => {
-        if (sub.id === subscriptionId) {
-          return {
-            ...sub,
-            status: 'active',
-            lastUpdate: new Date().toISOString(),
-            updateCount: sub.updateCount + mockContents.length,
-            crawledContents: [...mockContents, ...sub.crawledContents].slice(0, 50) // 限制最多50条
-          };
-        }
-        return sub;
-      }));
+      // 使用真实的爬取服务
+      const crawlResult = await crawlerService.crawlWebsite(subscription.url, {
+        timeRange: 'oneMonth', // 过去30天
+        maxArticles: 20,        // 最多爬取20篇文章
+        includeImages: false
+      });
+
+      if (crawlResult.success && crawlResult.contents.length > 0) {
+        console.log(`成功爬取 ${crawlResult.contents.length} 篇文章`);
+
+        // 更新订阅内容
+        setSubscriptions(prev => prev.map(sub => {
+          if (sub.id === subscriptionId) {
+            // 避免重复URL的内容
+            const existingUrls = new Set(sub.crawledContents.map(content => content.url));
+            const newContents = crawlResult.contents.filter(content => !existingUrls.has(content.url));
+
+            return {
+              ...sub,
+              status: 'active',
+              lastUpdate: new Date().toISOString(),
+              updateCount: sub.updateCount + newContents.length,
+              crawledContents: [...newContents, ...sub.crawledContents].slice(0, 100) // 限制最多100条
+            };
+          }
+          return sub;
+        }));
+      } else {
+        console.warn('爬取完成但没有获取到内容:', crawlResult.error);
+        // 即使没有新内容，也更新状态为活跃
+        setSubscriptions(prev => prev.map(sub =>
+          sub.id === subscriptionId ? { ...sub, status: 'active' } : sub
+        ));
+      }
 
     } catch (error) {
       console.error('爬取失败:', error);
