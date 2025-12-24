@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
 import Home from './views/Home';
@@ -252,6 +253,7 @@ const App: React.FC = () => {
     <ErrorBoundary>
       <LanguageProvider>
         <AppContent />
+        <Analytics />
       </LanguageProvider>
     </ErrorBoundary>
   );
