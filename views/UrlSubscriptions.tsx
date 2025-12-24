@@ -55,6 +55,8 @@ const UrlSubscriptions: React.FC = () => {
   const [searchUrl, setSearchUrl] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [isCrawling, setIsCrawling] = useState<string | null>(null);
+  const [previewArticle, setPreviewArticle] = useState<CrawledContent | null>(null);
+  const [isLoadingArticle, setIsLoadingArticle] = useState(false);
   const [newSubscription, setNewSubscription] = useState({
     name: '',
     url: '',
@@ -163,6 +165,28 @@ const UrlSubscriptions: React.FC = () => {
       ));
     } finally {
       setIsCrawling(null);
+    }
+  };
+
+  // 预览文章内容
+  const handlePreviewArticle = async (article: CrawledContent) => {
+    setIsLoadingArticle(true);
+    setPreviewArticle(article);
+
+    try {
+      // 尝试获取更详细的文章内容
+      const detailedContent = await crawlerService.getArticleContent(article.url);
+
+      // 更新文章内容
+      setPreviewArticle(prev => prev ? {
+        ...prev,
+        content: detailedContent
+      } : null);
+    } catch (error) {
+      console.error('获取文章详细内容失败:', error);
+      // 如果获取失败，保持原有内容
+    } finally {
+      setIsLoadingArticle(false);
     }
   };
 
@@ -423,6 +447,12 @@ const UrlSubscriptions: React.FC = () => {
                           <p className="text-xs text-gray-600 line-clamp-2 mb-1">{content.content}</p>
                           <div className="flex items-center gap-3 text-xs text-gray-500">
                             <span>发布: {formatTime(content.publishedAt)}</span>
+                            <button
+                              onClick={() => handlePreviewArticle(content)}
+                              className="text-green-600 hover:text-green-700 font-medium"
+                            >
+                              预览
+                            </button>
                             <a
                               href={content.url}
                               target="_blank"
@@ -543,6 +573,129 @@ const UrlSubscriptions: React.FC = () => {
                 <li>• 支持定期更新，获取最新的网站内容</li>
                 <li>• 所有内容都包含发布时间和爬取时间信息</li>
               </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 文章预览模态框 */}
+      {previewArticle && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col">
+            {/* 模态框头部 */}
+            <div className="p-6 border-b border-gray-200 flex justify-between items-start">
+              <div className="flex-1 mr-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-1 rounded-full bg-green-100 text-green-800 text-[10px] font-bold uppercase">
+                    文章预览
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {new Date(previewArticle.publishedAt).toLocaleString()}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 leading-snug mb-2">
+                  {previewArticle.title}
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-gray-600">
+                  {previewArticle.author && (
+                    <span>作者: {previewArticle.author}</span>
+                  )}
+                  <span>爬取时间: {new Date(previewArticle.crawledAt).toLocaleString()}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setPreviewArticle(null)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* 模态框内容 */}
+            <div className="p-6 overflow-y-auto flex-1">
+              {isLoadingArticle ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">正在加载文章内容...</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="prose prose-sm max-w-none">
+                  <div className="space-y-4">
+                    {/* 文章摘要 */}
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">文章摘要</h4>
+                      <p className="text-gray-700 leading-relaxed">
+                        {previewArticle.content}
+                      </p>
+                    </div>
+
+                    {/* 文章信息 */}
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">文章信息</h4>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <strong>发布时间:</strong> {new Date(previewArticle.publishedAt).toLocaleString()}
+                        </div>
+                        <div>
+                          <strong>爬取时间:</strong> {new Date(previewArticle.crawledAt).toLocaleString()}
+                        </div>
+                        <div>
+                          <strong>文章链接:</strong>
+                          <a
+                            href={previewArticle.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-700 ml-1"
+                          >
+                            {previewArticle.url}
+                          </a>
+                        </div>
+                        {previewArticle.wordCount && (
+                          <div>
+                            <strong>字数统计:</strong> {previewArticle.wordCount} 字
+                          </div>
+                        )}
+                      </div>
+                      {previewArticle.tags && previewArticle.tags.length > 0 && (
+                        <div className="mt-3">
+                          <strong>标签:</strong>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {previewArticle.tags.map((tag, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 操作按钮 */}
+                    <div className="flex gap-3 pt-4 border-t border-gray-200">
+                      <a
+                        href={previewArticle.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        访问原文
+                      </a>
+                      <button
+                        onClick={() => setPreviewArticle(null)}
+                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        关闭预览
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
