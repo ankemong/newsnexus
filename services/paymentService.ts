@@ -3,13 +3,13 @@ import { createClient } from '@supabase/supabase-js';
 
 export class PaymentService {
   private supabase = createClient(
-    import.meta.env.VITE_SUPABASE_URL || 'https://nzrorivjkehhhuomgkbo.supabase.co',
-    import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cm9yaXZqa2VoaGh1b21na2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NDkwODUsImV4cCI6MjA4MDQyNTA4NX0.237_P7wQnvobBKTe2C-goHScYrUba_eZNfALdrZE2l4'
+    import.meta.env.VITE_SUPABASE_URL || '',
+    import.meta.env.VITE_SUPABASE_ANON_KEY || ''
   );
 
   // 获取支付函数URL
   private getPaymentFunctionUrl(functionName: string): string {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://nzrorivjkehhhuomgkbo.supabase.co';
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
     const projectRef = supabaseUrl?.match(/https:\/\/(.+)\.supabase\.co/)?.[1];
     return `https://${projectRef}.supabase.co/functions/v1/${functionName}`;
   }
@@ -43,7 +43,7 @@ export class PaymentService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY}`
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({
           ...paymentRequest,
@@ -102,7 +102,7 @@ export class PaymentService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY}`
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({
           ...paymentRequest,
@@ -139,7 +139,7 @@ export class PaymentService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY}`
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({
           trade_no: tradeNo,
@@ -177,7 +177,7 @@ export class PaymentService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY}`
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({
           ...data,

@@ -59,38 +59,43 @@ const Pricing: React.FC = () => {
       basePrice: 0,
       type: 'basic' as const,
       features: [
-        `500 ${t('pricing.requestsLabel')}`,
-        `100 ${t('pricing.articlesLabel')}`,
-        `3 ${t('articles.allLangs').replace('All ', '')}`, // simplified logic
-        t('pricing.basicPlan') + ' Analytics'
+        `10 次关键词搜索`,
+        '5 篇文章下载',
+        '20 种语言支持',
+        'RSS订阅功能',
+        '基础仪表板'
       ],
       cta: t('pricing.currentPlan'),
       current: true,
     },
     {
       name: t('pricing.proPlan'),
-      basePrice: 29.99,
+      basePrice: 39.99,
       type: 'pro' as const,
       features: [
-        `50,000 ${t('pricing.requestsLabel')}`,
-        'Unlimited Articles',
-        t('articles.allLangs'),
-        t('articles.summary'),
-        'Priority Support'
+        `1,000 次关键词搜索`,
+        '无限文章下载',
+        '20 种语言支持',
+        'AI智能摘要',
+        '高级搜索过滤',
+        '优先技术支持'
       ],
       cta: t('pricing.upgrade'),
       highlight: true,
     },
     {
-      name: t('pricing.enterprisePlan'),
-      basePrice: 99.99,
+      name: '高级版',
+      basePrice: 199.99,
       type: 'enterprise' as const,
       features: [
-        'Unlimited Requests',
-        'Custom API Access',
-        'Dedicated Account Mgr',
-        'Sentiment Analysis',
-        'Whitelabel Reports'
+        `5,000 次关键词搜索`,
+        '无限文章下载',
+        '20 种语言支持',
+        'AI智能摘要',
+        '多语言翻译',
+        '高级搜索过滤',
+        '搜索历史导出',
+        '优先技术支持'
       ],
       cta: t('pricing.contactSales'),
     }

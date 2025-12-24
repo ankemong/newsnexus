@@ -3,13 +3,16 @@ import express from 'express';
 import cors from 'cors';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const port = 3006;
 
 // 配置CORS
 app.use(cors({
-  origin: ['http://localhost:3000' 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004', 'http://localhost:3005'],
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004', 'http://localhost:3005'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -18,7 +21,7 @@ app.use(cors({
 app.use(express.json());
 
 // 初始化Resend
-const resend = new Resend('re_hqp1vt2N_nsaqF4uc7uSBf7MuxZ4harvr');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // 验证码发送接口
 app.post('/api/send-verification-email', async (req, res) => {
@@ -35,8 +38,8 @@ app.post('/api/send-verification-email', async (req, res) => {
 
     // 保存到数据库
     const supabase = createClient(
-      'https://nzrorivjkehhhuomgkbo.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cm9yaXZqa2VoaGh1b21na2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NDkwODUsImV4cCI6MjA4MDQyNTA4NX0.237_P7wQnvobBKTe2C-goHScYrUba_eZNfALdrZE2l4'
+      process.env.VITE_SUPABASE_URL,
+      process.env.VITE_SUPABASE_ANON_KEY
     );
 
     // 检查60秒内是否已发送
@@ -127,8 +130,8 @@ app.post('/api/verify-code', async (req, res) => {
     }
 
     const supabase = createClient(
-      'https://nzrorivjkehhhuomgkbo.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cm9yaXZqa2VoaGh1b21na2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NDkwODUsImV4cCI6MjA4MDQyNTA4NX0.237_P7wQnvobBKTe2C-goHScYrUba_eZNfALdrZE2l4'
+      process.env.VITE_SUPABASE_URL,
+      process.env.VITE_SUPABASE_ANON_KEY
     );
 
     // 查询验证码

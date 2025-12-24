@@ -117,21 +117,8 @@ export const crawlNewsByKeyword = async (keyword: string, languages: Language[])
 
   } catch (error) {
     console.error("Gemini Crawl Error:", error);
-    // Return mock data if API fails or key missing
-    return [
-      {
-        id: 'mock-1',
-        title: `Simulated News: Update on ${keyword}`,
-        source: 'Global News Network',
-        publishedAt: new Date().toISOString(),
-        url: '#',
-        content: `This is a simulated article content. The system could not reach the live API. It discusses ${keyword}.`,
-        language: languages[0],
-        category: 'Technology',
-        sentiment: 'positive',
-        imageUrl: 'https://picsum.photos/800/600'
-      }
-    ];
+    // If the API fails or API key is missing, return an empty array to show a blank state
+    return [];
   }
 };
 

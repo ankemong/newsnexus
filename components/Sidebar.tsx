@@ -3,15 +3,13 @@
 import React from 'react';
 import { 
   LayoutDashboard, 
-  Globe, 
   Rss, 
-  Newspaper, 
-  PieChart, 
   CreditCard,
   LogOut,
   User,
   Bell,
-  Database
+  Database,
+  Globe
 } from 'lucide-react';
 import { ViewState } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -29,11 +27,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isMobileOpen, s
 
   const navItems = [
     { id: 'dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
-    { id: 'crawler', label: t('nav.crawler'), icon: Globe },
     { id: 'subscriptions', label: t('nav.subscriptions'), icon: Rss },
-    { id: 'articles', label: t('nav.articles'), icon: Newspaper },
-    { id: 'my-crawls', label: t('nav.myCrawls'), icon: Database },
-    { id: 'analytics', label: t('nav.analytics'), icon: PieChart },
+
   ];
 
   const accountItems = [

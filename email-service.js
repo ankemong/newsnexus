@@ -3,7 +3,7 @@
 
 import { Resend } from 'resend';
 
-const resend = new Resend('re_hqp1vt2N_nsaqF4uc7uSBf7MuxZ4harvr');
+const resend = new Resend(import.meta.env?.VITE_RESEND_API_KEY || process.env.RESEND_API_KEY);
 
 export async function sendVerificationEmail(email) {
   try {

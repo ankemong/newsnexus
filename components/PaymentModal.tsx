@@ -26,7 +26,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [paymentResult, setPaymentResult] = useState<PaymentResult | null>(null);
 
-  const paymentTypes = paymentService.getPaymentTypes();
+  const paymentTypes = paymentService.constructor.getPaymentTypes();
 
   const handlePayment = async () => {
     setLoading(true);

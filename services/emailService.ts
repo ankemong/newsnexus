@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
 // 初始化 Resend 客户端
-const resend = new Resend(process.env.RESEND_API_KEY || 're_hqp1vt2N_nsaqF4uc7uSBf7MuxZ4harvr');
+const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY || '');
 
 export interface EmailOptions {
   from: string;

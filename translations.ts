@@ -5,7 +5,7 @@ interface TranslationStructure {
   nav: {
     dashboard: string;
     crawler: string;
-    myCrawls: string;
+
     subscriptions: string;
     articles: string;
     analytics: string;
@@ -119,12 +119,7 @@ interface TranslationStructure {
     retrievingContent: string;
     snippetMode: string;
   };
-  myCrawls: {
-    title: string;
-    desc: string;
-    noData: string;
-    source: string;
-  };
+
   home: {
     headline: string;
     sub: string;
@@ -245,7 +240,7 @@ const en: TranslationStructure = {
   nav: {
     dashboard: 'Dashboard',
     crawler: 'Keyword Subscription',
-    myCrawls: 'My Crawls',
+
     subscriptions: 'URL Subscriptions',
     articles: 'Article Feed',
     analytics: 'Analytics',
@@ -359,12 +354,7 @@ const en: TranslationStructure = {
     retrievingContent: 'Retrieving full article content via AI...',
     snippetMode: 'Content is displayed in snippet mode.'
   },
-  myCrawls: {
-    title: 'My Crawled Articles',
-    desc: 'Articles found and saved from your keyword searches.',
-    noData: 'No crawled articles yet. Use the Keyword Search to find articles.',
-    source: 'Source'
-  },
+
   home: {
     headline: "Global News at Your Fingertips.",
     sub: "Monitor global events in 18 languages. Aggregate RSS, APIs, and HTML sources into one unified dashboard.",
@@ -486,7 +476,7 @@ const zh: TranslationStructure = {
   nav: {
     dashboard: '仪表板',
     crawler: '关键词订阅',
-    myCrawls: '我的爬取',
+
     subscriptions: 'URL 订阅',
     articles: '新闻文章',
     analytics: '数据分析',
@@ -495,12 +485,7 @@ const zh: TranslationStructure = {
     payment: '订阅计划',
     logout: '退出登录'
   },
-  myCrawls: {
-    title: '我的爬取文章',
-    desc: '从关键词搜索中发现并保存的文章。',
-    noData: '暂无爬取文章。请使用关键词搜索查找文章。',
-    source: '来源'
-  },
+
   common: {
     searchPlaceholder: '快速搜索...',
     welcome: '欢迎',
@@ -727,7 +712,7 @@ const zhTW: TranslationStructure = {
   nav: {
     dashboard: '儀表板',
     crawler: '關鍵字訂閱',
-    myCrawls: '我的爬取',
+
     subscriptions: 'URL 訂閱',
     articles: '文章動態',
     analytics: '數據分析',
@@ -803,7 +788,7 @@ const createFullLang = (
     dashboard: { ...base.dashboard, ...overrides.dashboard },
     auth: { ...base.auth, ...overrides.auth },
     crawler: { ...base.crawler, ...overrides.crawler },
-    myCrawls: { ...base.myCrawls, ...overrides.myCrawls },
+
     home: { ...base.home, ...overrides.home },
     articles: { ...base.articles, ...overrides.articles },
     subscriptions: { ...base.subscriptions, ...overrides.subscriptions },
@@ -813,7 +798,7 @@ const createFullLang = (
 };
 
 const es = createFullLang(en, {
-  nav: { dashboard: 'Tablero', crawler: 'Suscripción Palabras Clave', myCrawls: 'Mis Búsquedas', subscriptions: 'Suscripciones', articles: 'Noticias', analytics: 'Analítica', notifications: 'Notificaciones', profile: 'Mi Cuenta', payment: 'Facturación', logout: 'Cerrar Sesión' },
+  nav: { dashboard: 'Tablero', crawler: 'Suscripción Palabras Clave', subscriptions: 'Suscripciones', articles: 'Noticias', analytics: 'Analítica', notifications: 'Notificaciones', profile: 'Mi Cuenta', payment: 'Facturación', logout: 'Cerrar Sesión' },
   dashboard: {
     totalArticles: 'Total de Artículos',
     activeCrawlers: 'Búsquedas Activas',
@@ -998,7 +983,7 @@ const fr = createFullLang(en, {
     liveTag: "EN DIRECT",
     demoTime: "il y a 2h"
   },
-  nav: { dashboard: 'Tableau de bord', crawler: 'Abonnement Mots-clés', myCrawls: 'Mes Recherches', subscriptions: 'Abonnements', articles: 'Articles', analytics: 'Analytique', notifications: 'Notifications', profile: 'Mon Compte', payment: 'Facturation', logout: 'Déconnexion' },
+  nav: { dashboard: 'Tableau de bord', crawler: 'Abonnement Mots-clés', subscriptions: 'Abonnements', articles: 'Articles', analytics: 'Analytique', notifications: 'Notifications', profile: 'Mon Compte', payment: 'Facturation', logout: 'Déconnexion' },
   dashboard: {
     totalArticles: 'Total Articles',
     activeCrawlers: 'Recherches Actives',
@@ -1059,12 +1044,7 @@ const fr = createFullLang(en, {
       delete: 'Supprimer',
       mon: 'Lun', tue: 'Mar', wed: 'Mer', thu: 'Jeu', fri: 'Ven', sat: 'Sam', sun: 'Dim'
   },
-  myCrawls: {
-    title: 'Mes articles',
-    desc: 'Articles trouvés via vos recherches.',
-    noData: 'Aucune donnée.',
-    source: 'Source'
-  },
+
   subscriptions: {
     title: 'S\'abonner à une source',
     desc: 'Entrez une URL RSS, API ou HTML.',
@@ -1190,7 +1170,7 @@ const de = createFullLang(en, {
     liveTag: "LIVE",
     demoTime: "vor 2 Std."
   },
-  nav: { dashboard: 'Dashboard', crawler: 'Keyword-Abo', myCrawls: 'Meine Suche', subscriptions: 'Abos', articles: 'Artikel', analytics: 'Analytik', notifications: 'Benachrichtigungen', profile: 'Mein Konto', payment: 'Abrechnung', logout: 'Abmelden' },
+  nav: { dashboard: 'Dashboard', crawler: 'Keyword-Abo', subscriptions: 'Abos', articles: 'Artikel', analytics: 'Analytik', notifications: 'Benachrichtigungen', profile: 'Mein Konto', payment: 'Abrechnung', logout: 'Abmelden' },
   dashboard: {
     totalArticles: 'Gesamtartikel',
     activeCrawlers: 'Aktive Suchen',
@@ -1251,12 +1231,7 @@ const de = createFullLang(en, {
       delete: 'Löschen',
       mon: 'Mo', tue: 'Di', wed: 'Mi', thu: 'Do', fri: 'Fr', sat: 'Sa', sun: 'So'
   },
-  myCrawls: {
-    title: 'Meine Artikel',
-    desc: 'Gefundene Artikel.',
-    noData: 'Keine Daten.',
-    source: 'Quelle'
-  },
+
   subscriptions: {
     title: 'Feed abonnieren',
     desc: 'URL eingeben (RSS, API, HTML).',
@@ -1347,7 +1322,7 @@ const de = createFullLang(en, {
 
 // Update Russian
 const ru = createFullLang(en, {
-    nav: { dashboard: 'Дашборд', crawler: 'Подписка на ключевые слова', myCrawls: 'Мои поиски', subscriptions: 'URL Подписки', articles: 'Лента статей', analytics: 'Аналитика', notifications: 'Уведомления', profile: 'Мой профиль', payment: 'Оплата', logout: 'Выйти' },
+    nav: { dashboard: 'Дашборд', crawler: 'Подписка на ключевые слова', subscriptions: 'URL Подписки', articles: 'Лента статей', analytics: 'Аналитика', notifications: 'Уведомления', profile: 'Мой профиль', payment: 'Оплата', logout: 'Выйти' },
     dashboard: {
       totalArticles: 'Всего статей',
       activeCrawlers: 'Активные поиски',
@@ -1475,7 +1450,7 @@ const ru = createFullLang(en, {
 });
 
 const ja = createFullLang(en, {
-    nav: { dashboard: 'ダッシュボード', crawler: 'キーワード購読', myCrawls: '私の検索', subscriptions: '購読', articles: '記事', analytics: '分析', notifications: '通知', profile: 'アカウント', payment: '支払い', logout: 'ログアウト' },
+    nav: { dashboard: 'ダッシュボード', crawler: 'キーワード購読', subscriptions: '購読', articles: '記事', analytics: '分析', notifications: '通知', profile: 'アカウント', payment: '支払い', logout: 'ログアウト' },
     dashboard: {
       totalArticles: '総記事数',
       activeCrawlers: 'アクティブな検索',
@@ -1571,12 +1546,7 @@ const ja = createFullLang(en, {
         delete: '削除',
         mon: '月', tue: '火', wed: '水', thu: '木', fri: '金', sat: '土', sun: '日'
     },
-    myCrawls: {
-        title: '保存された記事',
-        desc: '検索で見つかった記事です。',
-        noData: 'データなし。',
-        source: 'ソース'
-    },
+
     subscriptions: {
         title: 'フィード購読',
         desc: 'URLを入力 (RSS, API, HTML).',

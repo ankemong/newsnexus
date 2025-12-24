@@ -4,12 +4,10 @@ import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
 import Home from './views/Home';
 import Dashboard from './views/Dashboard';
-import Crawler from './views/Crawler';
-import Subscriptions from './views/Subscriptions';
-import Articles, { ArticleDetail } from './views/Articles';
-import MyCrawls from './views/MyCrawls';
+import ArticleDownloads from './views/ArticleDownloads';
+import UrlSubscriptions from './views/UrlSubscriptions';
+
 import Notifications from './views/Notifications';
-import Analytics from './views/Analytics';
 import Profile from './views/Profile';
 import Auth from './views/Auth';
 import Pricing from './views/Pricing';
@@ -44,19 +42,24 @@ class ErrorBoundary extends React.Component {
     // @ts-ignore
     if ((this.state as any).hasError) {
       return (
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">出错了</h2>
-            <p className="text-gray-600 mb-4">应用遇到了一个错误</p>
+        <div className="flex items-center justify-center h-screen bg-black text-white font-sans">
+          <div className="text-center p-10 rounded-lg bg-gray-900 border border-gray-800 shadow-xl max-w-md mx-auto">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-800 border border-gray-700 mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-100 mt-4 mb-2">应用遇到错误</h2>
+            <p className="text-gray-400 mb-6">抱歉，程序出现了一个问题，请刷新页面重试。</p>
             <button
               onClick={() => {
                 // @ts-ignore
                 (this as any).setState({ hasError: false, error: undefined });
                 window.location.reload();
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-6 py-2 bg-gray-800 text-gray-300 font-medium rounded-md border border-gray-700 hover:bg-gray-700 hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-gray-500"
             >
-              重新加载
+              刷新页面
             </button>
           </div>
         </div>
@@ -74,35 +77,35 @@ const AppContent: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // State for user's crawled articles
-  const [myCrawledArticles, setMyCrawledArticles] = useState<Article[]>([]);
+
 
   const { t } = useLanguage();
 
-  // 处理文章查看详情
-  const handleViewArticleDetail = (article: Article) => {
-    setSelectedArticle(article);
-    setCurrentView('article-detail');
+  // 处理文章查看详情（功能已移除，保持空操作以避免导航）
+  const handleViewArticleDetail = (_article: Article) => {
+    console.info('Article detail view has been disabled.');
   };
 
   // 处理视图导航，包含状态清理
   const handleNavigate = (view: ViewState) => {
+    // 移除的数据分析/新闻文章/爬虫功能直接重定向到 dashboard
+    const blockedViews: ViewState[] = ['analytics', 'articles', 'article-detail', 'crawler'];
+    const targetView = blockedViews.includes(view) ? 'dashboard' : view;
+
     // 如果离开文章详情页，延迟清空选中文章
-    if (currentView === 'article-detail' && view !== 'article-detail') {
-      setCurrentView(view);
+    if (currentView === 'article-detail' && targetView !== 'article-detail') {
+      setCurrentView(targetView);
       setTimeout(() => setSelectedArticle(null), 100);
     } else {
-      setCurrentView(view);
+      setCurrentView(targetView);
       // 如果不是进入文章详情页，立即清空
-      if (view !== 'article-detail') {
+      if (targetView !== 'article-detail') {
         setSelectedArticle(null);
       }
     }
   };
 
-  const handleCrawlComplete = (articles: Article[]) => {
-      setMyCrawledArticles(prev => [...articles, ...prev]);
-  };
+
 
   // 防护：如果状态不一致，自动修复
   useEffect(() => {
@@ -165,26 +168,12 @@ const AppContent: React.FC = () => {
 
     switch (currentView) {
       case 'dashboard':
-        return <Dashboard onCrawlComplete={handleCrawlComplete} />;
-      case 'crawler':
-        return <Crawler />;
-      case 'my-crawls':
-        return <MyCrawls articles={myCrawledArticles} onViewDetail={handleViewArticleDetail} />;
+        return <Dashboard />;
+
       case 'subscriptions':
-        return <Subscriptions />;
-      case 'articles':
-        return <Articles onViewDetail={handleViewArticleDetail} />;
-      case 'article-detail':
-        return selectedArticle
-          ? <ArticleDetail
-              article={selectedArticle}
-              onBack={() => handleNavigate('articles')}
-            />
-          : null; // 不会执行到这里，因为有上面的防护
+        return <UrlSubscriptions />;
       case 'notifications':
         return <Notifications />;
-      case 'analytics':
-        return <Analytics />;
       case 'profile':
         return <Profile />;
       case 'payment':
@@ -201,13 +190,9 @@ const AppContent: React.FC = () => {
   const getTitle = () => {
     switch(currentView) {
       case 'dashboard': return t('nav.dashboard');
-      case 'crawler': return t('nav.crawler');
-      case 'my-crawls': return t('nav.myCrawls');
+
       case 'subscriptions': return t('nav.subscriptions');
-      case 'articles': return t('nav.articles');
-      case 'article-detail': return t('articles.detail') || 'Article Details';
       case 'notifications': return t('nav.notifications');
-      case 'analytics': return t('nav.analytics');
       case 'payment': return t('nav.payment');
       case 'profile': return t('nav.profile');
       default: return 'NewsNexus';

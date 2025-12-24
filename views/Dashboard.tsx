@@ -6,14 +6,12 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { crawlNewsByKeyword } from '../services/geminiService';
 import { getLocalStats, addArticlesToStats, recordSearchInStats, LocalStatsData } from '../services/localStatsService';
 import { Article } from '../types';
-import StatCard from '../components/StatCard';
+import ModernStats from '../components/ModernStats';
 import SearchLog from '../components/SearchLog';
 
-interface DashboardProps {
-    onCrawlComplete?: (articles: Article[]) => void;
-}
+interface DashboardProps {}
 
-const Dashboard: React.FC<DashboardProps> = ({ onCrawlComplete }) => {
+const Dashboard: React.FC<DashboardProps> = () => {
   const { t, language } = useLanguage();
 
   // Search State
@@ -76,9 +74,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onCrawlComplete }) => {
         setSearchProgress(100);
         setSearchStatus(`搜索完成！耗时 ${processingTime.toFixed(1)} 秒，找到 ${results.length} 篇文章`);
 
-        if (onCrawlComplete) {
-            onCrawlComplete(results);
-        }
+
 
         // 3秒后清除状态
         setTimeout(() => {
@@ -103,37 +99,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onCrawlComplete }) => {
 
   return (
     <div className="space-y-8">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title={t('dashboard.totalArticles')}
-          value={stats?.totalArticles.toLocaleString() || '0'}
-          change={`${stats?.weeklyChange.articles > 0 ? '+' : ''}${stats?.weeklyChange.articles || 0}%`}
-          icon={Newspaper}
-          colorClass="bg-black"
-        />
-        <StatCard
-          title={t('dashboard.activeCrawlers')}
-          value={stats?.activeCrawlers.toString() || '0'}
-          change={`${stats?.weeklyChange.crawlers > 0 ? '+' : ''}${stats?.weeklyChange.crawlers || 0}`}
-          icon={Rss}
-          colorClass="bg-gray-800"
-        />
-        <StatCard
-          title={t('dashboard.avgTime')}
-          value={stats ? `${stats.avgProcessingTime.toFixed(1)}s` : '0s'}
-          change={`${stats?.weeklyChange.processingTime > 0 ? '+' : ''}${stats?.weeklyChange.processingTime || 0}s`}
-          icon={Clock}
-          colorClass="bg-gray-600"
-        />
-        <StatCard
-          title={t('dashboard.readership')}
-          value={stats?.readership > 1000 ? `${(stats.readership / 1000).toFixed(1)}k` : stats?.readership.toString() || '0'}
-          change={`${stats?.weeklyChange.readership > 0 ? '+' : ''}${stats?.weeklyChange.readership || 0}%`}
-          icon={Users}
-          colorClass="bg-gray-400"
-        />
-      </div>
+      {/* Modern Stats Component */}
+      <ModernStats stats={stats} t={t} />
 
       {/* Search Section */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
