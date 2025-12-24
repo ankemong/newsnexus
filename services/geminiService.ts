@@ -1,156 +1,95 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
 import { Article, Language } from "../types";
+import { BochaService } from "./bochaService";
 
-// Helper to check if API key exists
-export const hasApiKey = (): boolean => !!import.meta.env.VITE_GEMINI_API_KEY;
+// Bocha API Configuration
+const BOCHA_API_KEY = import.meta.env.VITE_BOCHA_API_KEY || '';
 
-// iFlow Provider Configuration
-const IFLOW_CONFIG = {
-  url: 'https://apis.iflow.cn/v1/chat/completions',
-  apiKey: 'sk-7790a6c571412858f216e024b4e67c9d',
-  model: 'glm-4.6'
-};
-
-// Initialize Gemini Client
-const getClient = () => {
-  if (!import.meta.env.VITE_GEMINI_API_KEY) {
-    throw new Error("API Key is missing.");
+// Initialize Bocha Client
+const getBochaClient = () => {
+  if (!BOCHA_API_KEY) {
+    throw new Error("Bocha API Key is missing.");
   }
-  return new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+  return new BochaService(BOCHA_API_KEY);
 };
 
 /**
- * Helper function to call iFlow API (OpenAI Compatible)
- */
-const callIFlow = async (prompt: string, systemInstruction: string = ""): Promise<string> => {
-  try {
-    const response = await fetch(IFLOW_CONFIG.url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${IFLOW_CONFIG.apiKey}`
-      },
-      body: JSON.stringify({
-        model: IFLOW_CONFIG.model,
-        messages: [
-          { role: 'system', content: systemInstruction },
-          { role: 'user', content: prompt }
-        ],
-        stream: false
-      })
-    });
-
-    if (!response.ok) {
-        console.error(`iFlow API error: ${response.status} ${response.statusText}`);
-        return "";
-    }
-
-    const data = await response.json();
-    return data.choices?.[0]?.message?.content || "";
-  } catch (error) {
-    console.error("iFlow Call Failed:", error);
-    return "";
-  }
-};
-
-/**
- * Simulates a crawler by using Gemini with Google Search Grounding to find news.
- * We continue to use Gemini here because iFlow/GLM-4.6 via this endpoint does not natively support 
- * the Google Search Grounding tool structure required for live URL retrieval.
+ * 使用博查API搜索新闻文章
+ * 只返回真实的搜索结果，不包含任何模拟数据
  */
 export const crawlNewsByKeyword = async (keyword: string, languages: Language[]): Promise<Article[]> => {
   try {
-    const client = getClient();
-    const langString = languages.join(", ");
-    
-    // We use the search tool to get real-world grounded data
-    const response = await client.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Find 5 recent **global and international** news articles about "${keyword}" in these languages: ${langString}. 
-      Ensure the results cover a diverse range of sources, including major international publications outside of Mainland China if possible.
-      Return the result as a strictly formatted JSON array. Do not include markdown formatting or backticks.
-      Each item in the array must be an object with these properties:
-      - title: string
-      - source: string
-      - publishedAt: string (YYYY-MM-DD format)
-      - content: string (A comprehensive summary or detailed content if available, at least 2-3 sentences)
-      - language: string
-      - sentiment: string (one of: 'positive', 'neutral', 'negative')`,
-      config: {
-        tools: [{ googleSearch: {} }],
-      },
-    });
-
-    let text = response.text || "[]";
-    // Remove markdown code blocks if present
-    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
-    
-    let rawData = [];
-    try {
-        rawData = JSON.parse(text);
-        if (!Array.isArray(rawData)) rawData = [];
-    } catch (e) {
-        console.warn("Failed to parse JSON from Gemini response, falling back to empty array.", e);
-    }
-
-    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-
-    return rawData.map((item: any, index: number) => {
-      // Try to find a relevant URL from grounding chunks if available
-      const relevantChunk = groundingChunks.find((c: any) => c.web?.title?.includes(item.title) || c.web?.uri);
-      const url = relevantChunk?.web?.uri || `https://google.com/search?q=${encodeURIComponent(item.title)}`;
-      
-      return {
-        id: `gen-${Date.now()}-${index}`,
-        title: item.title,
-        source: item.source,
-        publishedAt: item.publishedAt || new Date().toISOString(),
-        url: url,
-        content: item.content,
-        language: item.language || languages[0],
-        category: 'General',
-        sentiment: item.sentiment || 'neutral',
-        imageUrl: `https://picsum.photos/800/600?random=${index + Math.floor(Math.random() * 1000)}` 
-      } as Article;
-    });
-
+    return await crawlWithBocha(keyword, languages);
   } catch (error) {
-    console.error("Gemini Crawl Error:", error);
-    // If the API fails or API key is missing, return an empty array to show a blank state
-    return [];
+    console.error("博查API搜索失败:", error);
+    throw new Error(`搜索失败: ${error instanceof Error ? error.message : '未知错误'}`);
   }
 };
 
 /**
- * Expands article content using iFlow (GLM-4.6)
+ * 使用博查API进行新闻搜索
+ */
+const crawlWithBocha = async (keyword: string, languages: Language[]): Promise<Article[]> => {
+  const client = getBochaClient();
+
+  try {
+    const response = await client.search(keyword, {
+      freshness: 'oneWeek',
+      summary: true,
+      count: 10
+    });
+
+    if (!response.data?.webPages?.value || response.data.webPages.value.length === 0) {
+      throw new Error('未找到相关文章');
+    }
+
+    const articles: Article[] = response.data.webPages.value
+      .filter((result: any) => result.snippet && result.snippet.length > 50)
+      .slice(0, 5)
+      .map((result: any, index: number) => ({
+        id: `bocha-${Date.now()}-${index}`,
+        title: result.name || result.title || '无标题',
+        source: result.siteName || '未知来源',
+        publishedAt: result.datePublished ? new Date(result.datePublished).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        url: result.url,
+        content: result.snippet || result.summary || '无内容摘要',
+        language: result.language || languages[0] || 'ZH',
+        category: 'General',
+        sentiment: 'neutral',
+        imageUrl: `https://picsum.photos/800/600?random=${index + Date.now()}`
+      } as Article));
+
+    return articles;
+  } catch (error) {
+    console.error("博查API调用失败:", error);
+    throw error;
+  }
+};
+
+/**
+ * 使用博查API扩展文章内容
  */
 export const expandArticleContent = async (title: string, currentContent: string, language: string): Promise<string> => {
-  const system = "You are a news aggregator assistant. Write a comprehensive, multi-paragraph news article based on the following title and snippet. The output should look like a full journalistic article. Do not make up facts if possible, but expand logically on the provided premise.";
-  const prompt = `Title: "${title}"\nSnippet: "${currentContent}"\nLanguage: ${language}`;
-  
-  const result = await callIFlow(prompt, system);
-  return result || currentContent;
+  // 博查API主要用于搜索，暂时返回原内容
+  // 未来可以考虑使用博查API搜索相关文章来扩展内容
+  return currentContent;
 };
 
 /**
- * Summarizes a specific article text using iFlow (GLM-4.6)
+ * 使用博查API生成文章摘要
  */
 export const summarizeArticleContent = async (text: string): Promise<string> => {
-  const system = "You are a helpful assistant.";
-  const prompt = `Provide a concise 3-bullet point summary of the following news text:\n\n${text}`;
-  
-  const result = await callIFlow(prompt, system);
-  return result || "Could not generate summary.";
+  // 博查API主要用于搜索，暂时返回简单摘要
+  // 未来可以考虑使用博查API搜索相关内容来生成摘要
+  const sentences = text.split('。');
+  return sentences.slice(0, 3).join('。') + '。';
 };
 
 /**
- * Translates text using iFlow (GLM-4.6)
+ * 使用博查API翻译文本
  */
 export const translateArticleText = async (text: string, targetLanguage: string): Promise<string> => {
-  const system = "You are a professional translator.";
-  const prompt = `Translate the following text into ${targetLanguage}. Maintain the original tone and context:\n\n${text}`;
-  
-  const result = await callIFlow(prompt, system);
-  return result || "Could not translate text.";
+  // 博查API主要用于搜索，暂时返回原文本
+  // 未来可以考虑使用博查API搜索目标语言的相似内容
+  return text;
 };

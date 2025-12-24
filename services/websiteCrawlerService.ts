@@ -177,30 +177,39 @@ export class WebsiteCrawlerService {
   }
 
   /**
-   * 获取文章的详细内容（如果需要更深度的内容提取）
+   * 获取文章的详细内容（通过服务端代理解决跨域问题）
    */
   async getArticleContent(url: string): Promise<string> {
     try {
-      // 这里可以实现更复杂的内容提取逻辑
-      // 比如使用 readability API 或者其他内容提取服务
-      const response = await fetch(url);
-      const html = await response.text();
+      console.log(`正在通过代理获取文章内容: ${url}`);
 
-      // 简单的内容提取（实际项目中应该使用更复杂的算法）
-      const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-      const title = titleMatch ? titleMatch[1] : '';
+      // 使用服务端代理来获取文章内容
+      const response = await fetch('http://localhost:3006/api/fetch-article-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
 
-      // 提取主要内容（简化版）
-      const contentMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-      let content = contentMatch ? contentMatch[1] : '';
+      if (!response.ok) {
+        console.error(`代理请求失败: ${response.status} ${response.statusText}`);
+        return '无法获取文章详细内容';
+      }
 
-      // 移除HTML标签
-      content = content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+      const result = await response.json();
 
-      return `${title}\n\n${content.substring(0, 1000)}...`;
+      if (result.success && result.content) {
+        console.log(`成功获取文章内容，长度: ${result.extractedLength || result.content.length}`);
+        return result.content;
+      } else {
+        console.error('代理返回错误:', result.error);
+        return '无法获取文章详细内容';
+      }
     } catch (error) {
       console.error('获取文章内容失败:', error);
-      return '无法获取文章详细内容';
+      // 如果代理失败，返回一个基本的提示信息
+      return '无法获取文章详细内容，请直接访问原文链接查看完整内容。';
     }
   }
 

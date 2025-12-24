@@ -1,57 +1,55 @@
 
 import React, { useState } from 'react';
-import { Check, CreditCard, Lock, Crown, Zap } from 'lucide-react';
+import { Check, CreditCard, Lock, Crown, Zap, Heart, Coffee, Users, Star } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { PaymentButton, PaymentModal } from '../components/PaymentButton';
 import { PaymentModal as PaymentModalComponent } from '../components/PaymentModal';
 import { PaymentType, PaymentResult } from '../types/payment';
 
-type BillingCycle = 'monthly' | 'quarterly' | 'biannual' | 'yearly';
-
 const Pricing: React.FC = () => {
   const { t } = useLanguage();
   const [showPayment, setShowPayment] = useState(false);
-  const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
+  const [customAmount, setCustomAmount] = useState<string>('');
   const [selectedPlan, setSelectedPlan] = useState<{
     name: string;
     price: number;
-    type: 'basic' | 'pro' | 'enterprise';
+    type: 'donation' | string;
   } | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<{
     type: 'success' | 'error' | null;
     message: string;
   }>({ type: null, message: '' });
 
-  // Define multipliers/discounts
-  const cycleConfig: Record<BillingCycle, { multiplier: number, label: string, discount?: string }> = {
-    monthly: { multiplier: 1, label: t('pricing.perMonth') },
-    quarterly: { multiplier: 3, label: t('pricing.perQuarter'), discount: '5%' },
-    biannual: { multiplier: 6, label: t('pricing.perHalfYear'), discount: '10%' },
-    yearly: { multiplier: 12, label: t('pricing.perYear'), discount: '20%' },
-  };
-
-  const getPrice = (basePrice: number) => {
-    if (basePrice === 0) return '¥0';
-    const total = basePrice * cycleConfig[billingCycle].multiplier;
-    // Apply rough discount if applicable for visual effect (or just multiply logic)
-    // Here we just do direct multiplication for simplicity in demo, assuming base is monthly
-    let discounted = total;
-    if (billingCycle === 'quarterly') discounted = total * 0.95;
-    if (billingCycle === 'biannual') discounted = total * 0.90;
-    if (billingCycle === 'yearly') discounted = total * 0.80;
-
-    return `¥${Math.floor(discounted)}`;
-  };
-
-  const getActualPrice = (basePrice: number) => {
-    if (basePrice === 0) return 0;
-    const total = basePrice * cycleConfig[billingCycle].multiplier;
-    let discounted = total;
-    if (billingCycle === 'quarterly') discounted = total * 0.95;
-    if (billingCycle === 'biannual') discounted = total * 0.90;
-    if (billingCycle === 'yearly') discounted = total * 0.80;
-    return Math.floor(discounted);
-  };
+  const suggestedAmounts = [
+    {
+      name: '咖啡支持',
+      price: 5,
+      icon: Coffee,
+      description: '请我们喝杯咖啡，支持项目持续发展',
+      color: 'bg-yellow-50 border-yellow-200 hover:border-yellow-300'
+    },
+    {
+      name: '月度支持',
+      price: 20,
+      icon: Heart,
+      description: '帮助我们覆盖服务器成本',
+      color: 'bg-red-50 border-red-200 hover:border-red-300'
+    },
+    {
+      name: '年度支持',
+      price: 100,
+      icon: Users,
+      description: '支持新功能开发和社区建设',
+      color: 'bg-blue-50 border-blue-200 hover:border-blue-300'
+    },
+    {
+      name: '超级赞助',
+      price: 500,
+      icon: Star,
+      description: '支持重大功能更新和技术升级',
+      color: 'bg-purple-50 border-purple-200 hover:border-purple-300'
+    }
+  ];
 
   const plans = [
     {
@@ -104,7 +102,7 @@ const Pricing: React.FC = () => {
   const handlePaymentSuccess = (result: PaymentResult) => {
     setPaymentStatus({
       type: 'success',
-      message: `支付成功！订单号：${result.tradeNo}`
+      message: `感谢您的赞助！您的支持将帮助我们持续改进 NewsNexus。订单号：${result.tradeNo}`
     });
     setShowPayment(false);
     setSelectedPlan(null);
@@ -113,103 +111,142 @@ const Pricing: React.FC = () => {
   const handlePaymentError = (error: string) => {
     setPaymentStatus({
       type: 'error',
-      message: `支付失败：${error}`
+      message: `赞助失败：${error}`
     });
   };
 
-  const handleUpgrade = (plan: typeof plans[0]) => {
-    if (!plan.current) {
-      setSelectedPlan({
-        name: plan.name,
-        price: getActualPrice(plan.basePrice),
-        type: plan.type
+  const handleDonate = (tier: typeof suggestedAmounts[0]) => {
+    setSelectedPlan({
+      name: tier.name,
+      price: tier.price,
+      type: 'donation'
+    });
+    setShowPayment(true);
+  };
+
+  const handleCustomAmountPayment = () => {
+    const amount = parseFloat(customAmount);
+    if (isNaN(amount) || amount < 1) {
+      setPaymentStatus({
+        type: 'error',
+        message: '请输入有效的赞助金额（最少1元）'
       });
-      setShowPayment(true);
+      return;
     }
+
+    setSelectedPlan({
+      name: '自定义赞助',
+      price: amount,
+      type: 'donation'
+    });
+    setShowPayment(true);
   };
 
   return (
     <div className="max-w-6xl mx-auto py-8 space-y-12">
       <div className="text-center space-y-4">
         <h2 className="text-3xl font-bold text-gray-900">{t('nav.payment')}</h2>
-        
-        {/* Billing Cycle Switcher */}
-        <div className="inline-flex bg-gray-100 p-1 rounded-xl">
-           {(['monthly', 'quarterly', 'biannual', 'yearly'] as BillingCycle[]).map((cycle) => (
-             <button
-                key={cycle}
-                onClick={() => setBillingCycle(cycle)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all relative
-                   ${billingCycle === cycle ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}
-                `}
-             >
-                {t(`pricing.${cycle}`)}
-                {cycleConfig[cycle].discount && (
-                    <span className="absolute -top-3 -right-2 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">
-                        -{cycleConfig[cycle].discount}
+        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          NewsNexus 是一个开源免费的新闻聚合平台，您的赞助将帮助我们持续改进和开发新功能
+        </p>
+      </div>
+
+      {/* 赞助金额选择 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {suggestedAmounts.map((tier, index) => {
+          const Icon = tier.icon;
+          return (
+            <div
+              key={index}
+              className={`relative bg-white rounded-xl border-2 ${tier.color} shadow-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer`}
+              onClick={() => handleDonate(tier)}
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <Icon className="w-8 h-8 text-gray-700" />
+                  <div className="text-right">
+                    <span className="text-3xl font-bold text-gray-900">
+                      ¥{tier.price}
                     </span>
-                )}
-             </button>
-           ))}
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  {tier.name}
+                </h3>
+
+                <p className="text-gray-600 text-sm mb-4">
+                  {tier.description}
+                </p>
+
+                <button className="w-full bg-gray-800 text-white font-medium py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                  赞助支持
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 自定义金额赞助 */}
+      <div className="max-w-md mx-auto mb-8">
+        <div className="bg-white rounded-xl border-2 border-dashed border-gray-300 p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
+            自定义赞助金额
+          </h3>
+          <div className="flex space-x-2">
+            <div className="flex-1">
+              <input
+                type="number"
+                min="1"
+                step="0.01"
+                value={customAmount}
+                onChange={(e) => setCustomAmount(e.target.value)}
+                placeholder="输入赞助金额"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <button
+              onClick={handleCustomAmountPayment}
+              className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              赞助
+            </button>
+          </div>
+          <p className="text-sm text-gray-500 mt-2 text-center">
+            感谢您的任何金额支持，每一份赞助都很重要！
+          </p>
         </div>
       </div>
 
-      {/* Plans */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {plans.map((plan) => (
-          <div key={plan.name} className={`
-            relative p-8 rounded-2xl border flex flex-col
-            ${plan.highlight ? 'border-black shadow-xl bg-white scale-105 z-10' : 'border-gray-200 bg-white shadow-sm'}
-          `}>
-            {plan.highlight && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black text-white px-4 py-1 rounded-full text-sm font-semibold whitespace-nowrap">
-                {t('pricing.mostPopular')}
-              </div>
-            )}
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">{plan.name}</h3>
-            <div className="flex items-baseline mb-6">
-              <span className="text-4xl font-bold text-gray-900">{getPrice(plan.basePrice)}</span>
-              <span className="text-gray-500 ml-1">{cycleConfig[billingCycle].label}</span>
-            </div>
-
-            <ul className="space-y-4 mb-8 flex-1">
-              {plan.features.map((feature, i) => (
-                <li key={i} className="flex items-start">
-                  <Check className="w-5 h-5 text-black mr-2 flex-shrink-0" />
-                  <span className="text-gray-600 text-sm">{feature}</span>
-                </li>
-              ))}
-            </ul>
-
-            {plan.current ? (
-              <button
-                className="w-full py-3 rounded-lg font-medium bg-gray-100 text-gray-400 cursor-default"
-                disabled
-              >
-                {plan.cta}
-              </button>
-            ) : plan.type === 'enterprise' ? (
-              <button
-                className="w-full py-3 rounded-lg font-medium bg-white border-2 border-black text-black hover:bg-gray-50"
-                onClick={() => alert('请联系销售团队：sales@newsnexus.app')}
-              >
-                {plan.cta}
-              </button>
-            ) : (
-              <PaymentButton
-                product={{
-                  name: plan.name,
-                  price: getActualPrice(plan.basePrice),
-                  type: plan.type
-                }}
-                userEmail="user@example.com" // TODO: 从认证状态获取用户邮箱
-                onSuccess={handlePaymentSuccess}
-                onError={handlePaymentError}
-                className="w-full"
-              />
-            )}
+      {/* 项目说明和感谢 */}
+      <div className="text-center">
+        <div className="inline-flex items-center space-x-2 text-gray-600 mb-4">
+          <Heart className="w-5 h-5 text-red-500" />
+          <span className="font-medium">感谢您的支持</span>
+        </div>
+        <p className="text-sm text-gray-500 max-w-3xl mx-auto mb-6">
+          NewsNexus 是一个开源项目，致力于为用户提供免费、优质的新闻聚合服务。您的赞助将直接用于：
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto text-sm text-gray-600">
+          <div className="bg-white p-4 rounded-lg border">
+            <h4 className="font-medium mb-2">服务器成本</h4>
+            <p>覆盖服务器托管和带宽费用</p>
           </div>
-        ))}
+          <div className="bg-white p-4 rounded-lg border">
+            <h4 className="font-medium mb-2">功能开发</h4>
+            <p>开发新功能和改进用户体验</p>
+          </div>
+          <div className="bg-white p-4 rounded-lg border">
+            <h4 className="font-medium mb-2">社区建设</h4>
+            <p>构建活跃的用户社区</p>
+          </div>
+        </div>
+        <div className="mt-6">
+          <p className="text-xs text-gray-400">
+            所有赞助均为自愿行为，我们使用安全的支付渠道处理交易。支持支付宝、微信支付等方式。
+          </p>
+        </div>
       </div>
 
       {/* 支付状态提示 */}
@@ -228,36 +265,18 @@ const Pricing: React.FC = () => {
         </div>
       )}
 
-      {/* History */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-           <h3 className="font-bold text-gray-900">Billing History</h3>
-        </div>
-        <table className="w-full text-left text-sm text-gray-600">
-           <thead className="bg-gray-50 text-xs uppercase font-semibold text-gray-500">
-              <tr>
-                 <th className="px-6 py-3">Date</th>
-                 <th className="px-6 py-3">Description</th>
-                 <th className="px-6 py-3">Amount</th>
-                 <th className="px-6 py-3">Status</th>
-              </tr>
-           </thead>
-           <tbody className="divide-y divide-gray-100">
-              <tr>
-                 <td className="px-6 py-4">Oct 01, 2023</td>
-                 <td className="px-6 py-4">Pro Plan - Monthly</td>
-                 <td className="px-6 py-4">$5.00</td>
-                 <td className="px-6 py-4"><span className="text-gray-900 font-bold">Paid</span></td>
-              </tr>
-              <tr>
-                 <td className="px-6 py-4">Sep 01, 2023</td>
-                 <td className="px-6 py-4">Pro Plan - Monthly</td>
-                 <td className="px-6 py-4">$5.00</td>
-                 <td className="px-6 py-4"><span className="text-gray-900 font-bold">Paid</span></td>
-              </tr>
-           </tbody>
-        </table>
-      </div>
+      {/* 支付模态框 */}
+      {showPayment && selectedPlan && (
+        <PaymentModalComponent
+          isOpen={showPayment}
+          onClose={() => setShowPayment(false)}
+          productName={selectedPlan.name}
+          amount={selectedPlan.price}
+          userEmail="user@example.com" // TODO: 从认证状态获取用户邮箱
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
+        />
+      )}
     </div>
   );
 };

@@ -246,7 +246,7 @@ const en: TranslationStructure = {
     analytics: 'Analytics',
     notifications: 'Notifications',
     profile: 'My Account',
-    payment: 'Billing & Plans',
+    payment: 'Donate & Support',
     logout: 'Sign Out'
   },
   common: {
@@ -482,7 +482,7 @@ const zh: TranslationStructure = {
     analytics: '数据分析',
     notifications: '通知中心',
     profile: '我的账户',
-    payment: '订阅计划',
+    payment: '捐款赞助',
     logout: '退出登录'
   },
 
@@ -718,7 +718,7 @@ const zhTW: TranslationStructure = {
     analytics: '數據分析',
     notifications: '通知中心',
     profile: '我的帳戶',
-    payment: '訂閱計畫',
+    payment: '捐款贊助',
     logout: '登出'
   },
   crawler: {

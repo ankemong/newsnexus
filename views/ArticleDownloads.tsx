@@ -6,7 +6,7 @@ import { BochaService, BochaWebSearchResult } from '../services/bochaService';
 const ArticleDownloads: React.FC = () => {
   const { t } = useLanguage();
 
-  const [previewItem, setPreviewItem] = useState<BochaWebSearchResult | null>(null);
+  const [previewItem, setPreviewItem] = useState<(BochaWebSearchResult & { fullContent?: string }) | null>(null);
   const [downloadMenuOpen, setDownloadMenuOpen] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);

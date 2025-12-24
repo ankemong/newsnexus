@@ -166,6 +166,129 @@ app.post('/api/verify-code', async (req, res) => {
   }
 });
 
+// 文章内容获取代理接口
+app.post('/api/fetch-article-content', async (req, res) => {
+  try {
+    const { url } = req.body;
+
+    if (!url) {
+      return res.status(400).json({ error: 'URL is required' });
+    }
+
+    console.log(`Fetching article content for: ${url}`);
+
+    // 使用fetch获取网页内容
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+      },
+      timeout: 10000 // 10秒超时
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
+      return res.status(response.status).json({
+        error: `Failed to fetch article: ${response.statusText}`
+      });
+    }
+
+    const html = await response.text();
+    console.log(`Successfully fetched ${html.length} characters from ${url}`);
+
+    // 提取文章内容
+    let extractedContent = '';
+
+    try {
+      // 尝试提取标题
+      const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+      const title = titleMatch ? titleMatch[1] : '';
+
+      // 尝试提取主要内容区域
+      // 优先尝试常见的文章容器
+      const articleSelectors = [
+        /<article[^>]*>([\s\S]*?)<\/article>/i,
+        /<main[^>]*>([\s\S]*?)<\/main>/i,
+        /<div[^>]*class="[^"]*content[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+        /<div[^>]*class="[^"]*article[^"]*"[^>]*>([\s\S]*?)<\/div>/i,
+        /<div[^>]*id="[^"]*content[^"]*"[^>]*>([\s\S]*?)<\/div>/i
+      ];
+
+      let articleContent = '';
+      for (const selector of articleSelectors) {
+        const match = html.match(selector);
+        if (match && match[1].length > 200) {
+          articleContent = match[1];
+          break;
+        }
+      }
+
+      // 如果没找到文章容器，尝试提取body内容
+      if (!articleContent) {
+        const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        articleContent = bodyMatch ? bodyMatch[1] : '';
+      }
+
+      // 清理HTML标签和多余空白
+      let cleanContent = articleContent
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // 移除脚本
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // 移除样式
+        .replace(/<[^>]*>/g, ' ') // 移除HTML标签
+        .replace(/\s+/g, ' ') // 合并空白字符
+        .replace(/\n\s*\n/g, '\n') // 移除空行
+        .trim();
+
+      // 提取前几个段落作为内容预览
+      const paragraphs = cleanContent.split('\n').filter(p => p.length > 20);
+      if (paragraphs.length > 0) {
+        extractedContent = paragraphs.slice(0, 3).join('\n\n');
+      } else {
+        extractedContent = cleanContent.substring(0, 1000);
+      }
+
+      // 限制内容长度
+      if (extractedContent.length > 2000) {
+        extractedContent = extractedContent.substring(0, 2000) + '...';
+      }
+
+      res.json({
+        success: true,
+        title: title,
+        content: extractedContent || '无法提取文章内容',
+        originalLength: html.length,
+        extractedLength: extractedContent.length
+      });
+
+    } catch (extractionError) {
+      console.error('Error extracting content:', extractionError);
+      // 如果提取失败，返回原始HTML的清理版本
+      const cleanedHtml = html
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .substring(0, 500);
+
+      res.json({
+        success: true,
+        title: '文章内容',
+        content: cleanedHtml || '无法提取文章内容',
+        error: 'Content extraction failed'
+      });
+    }
+
+  } catch (error) {
+    console.error('Error in /api/fetch-article-content:', error);
+    res.status(500).json({
+      error: 'Failed to fetch article content',
+      message: error.message
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Email proxy server running on port ${port}`);
 });
