@@ -171,7 +171,7 @@ const AppContent: React.FC = () => {
         return <Dashboard />;
 
       case 'subscriptions':
-        return <UrlSubscriptions />;
+        return <ArticleDownloads />;
       case 'notifications':
         return <Notifications />;
       case 'profile':
