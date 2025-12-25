@@ -54,9 +54,9 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isMobileOpen, s
 
       {/* Sidebar Container */}
       <aside className={`
-        fixed top-0 left-0 z-30 h-full w-64 bg-black text-gray-300 transition-transform duration-300 ease-in-out
-        ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:relative lg:translate-x-0 flex flex-col border-r border-gray-800
+        fixed top-0 left-0 rtl:right-0 rtl:left-auto z-30 h-full w-64 bg-black text-gray-300 transition-transform duration-300 ease-in-out
+        ${isMobileOpen ? 'translate-x-0' : '-translate-x-full rtl:translate-x-full'}
+        lg:relative lg:translate-x-0 flex flex-col border-r rtl:border-l rtl:border-r-0 border-gray-800
       `}>
         {/* Logo */}
         <div className="p-6 border-b border-gray-800">

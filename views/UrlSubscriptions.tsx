@@ -16,6 +16,7 @@ interface UrlSubscription {
 }
 
 const UrlSubscriptions: React.FC = () => {
+  const { t } = useLanguage();
   const [crawlerService] = useState(() => new WebsiteCrawlerService());
   const [subscriptions, setSubscriptions] = useState<UrlSubscription[]>([
     {
@@ -242,10 +243,10 @@ const UrlSubscriptions: React.FC = () => {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffMins < 60) return `${diffMins}分钟前`;
-    if (diffHours < 24) return `${diffHours}小时前`;
-    if (diffDays < 30) return `${diffDays}天前`;
-    return date.toLocaleDateString('zh-CN');
+    if (diffMins < 60) return `${diffMins} ${t('subscriptions.minutesAgo')}`;
+    if (diffHours < 24) return `${diffHours} ${t('subscriptions.hoursAgo')}`;
+    if (diffDays < 30) return `${diffDays} ${t('subscriptions.daysAgo')}`;
+    return date.toLocaleDateString();
   };
 
   // 下载内容
@@ -298,13 +299,13 @@ const UrlSubscriptions: React.FC = () => {
     <div className="space-y-6">
       {/* 页面标题和添加按钮 */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">URL内容爬取</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('subscriptions.title')}</h2>
         <button
           onClick={() => setShowAddModal(true)}
           className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          添加URL
+          {t('subscriptions.addUrl')}
         </button>
       </div>
 
@@ -352,10 +353,10 @@ const UrlSubscriptions: React.FC = () => {
                     <div className="flex items-center gap-6 text-sm text-gray-500">
                       <div className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
-                        更新于 {formatTime(subscription.lastUpdate)}
+                        {t('subscriptions.updatedAt')} {formatTime(subscription.lastUpdate)}
                       </div>
                       <div>
-                        已爬取 {subscription.crawledContents.length} 条内容
+                        {subscription.crawledContents.length} {t('subscriptions.crawledCount')}
                       </div>
                     </div>
                   </div>
@@ -371,12 +372,12 @@ const UrlSubscriptions: React.FC = () => {
                     {isCrawling === subscription.id ? (
                       <>
                         <RefreshCw className="w-4 h-4 animate-spin" />
-                        爬取中...
+                        {t('subscriptions.crawling')}
                       </>
                     ) : (
                       <>
                         <RefreshCw className="w-4 h-4" />
-                        爬取内容
+                        {t('subscriptions.crawlContent')}
                       </>
                     )}
                   </button>
@@ -392,26 +393,26 @@ const UrlSubscriptions: React.FC = () => {
                         }}
                       >
                         <Download className="w-4 h-4" />
-                        下载
+                        {t('subscriptions.download')}
                       </button>
                       <div className="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10 hidden">
                         <button
                           onClick={() => handleDownloadContent(subscription, 'json')}
                           className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
                         >
-                          JSON格式
+                          {t('subscriptions.formats.json')}
                         </button>
                         <button
                           onClick={() => handleDownloadContent(subscription, 'csv')}
                           className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
                         >
-                          CSV格式
+                          {t('subscriptions.formats.csv')}
                         </button>
                         <button
                           onClick={() => handleDownloadContent(subscription, 'txt')}
                           className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
                         >
-                          TXT格式
+                          {t('subscriptions.formats.txt')}
                         </button>
                       </div>
                     </div>
@@ -437,7 +438,7 @@ const UrlSubscriptions: React.FC = () => {
               {/* 爬取的内容列表 */}
               {subscription.crawledContents.length > 0 && (
                 <div className="mt-6 border-t border-gray-100 pt-4">
-                  <h5 className="text-sm font-semibold text-gray-700 mb-3">最近爬取的内容 (过去30天)</h5>
+                  <h5 className="text-sm font-semibold text-gray-700 mb-3">{t('subscriptions.recentContent')}</h5>
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {subscription.crawledContents.slice(0, 5).map((content) => (
                       <div key={content.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
@@ -446,12 +447,12 @@ const UrlSubscriptions: React.FC = () => {
                           <h6 className="text-sm font-medium text-gray-900 truncate mb-1">{content.title}</h6>
                           <p className="text-xs text-gray-600 line-clamp-2 mb-1">{content.content}</p>
                           <div className="flex items-center gap-3 text-xs text-gray-500">
-                            <span>发布: {formatTime(content.publishedAt)}</span>
+                            <span>{t('subscriptions.published')} {formatTime(content.publishedAt)}</span>
                             <button
                               onClick={() => handlePreviewArticle(content)}
                               className="text-green-600 hover:text-green-700 font-medium"
                             >
-                              预览
+                              {t('subscriptions.preview')}
                             </button>
                             <a
                               href={content.url}
@@ -459,7 +460,7 @@ const UrlSubscriptions: React.FC = () => {
                               rel="noopener noreferrer"
                               className="text-blue-600 hover:text-blue-700"
                             >
-                              查看原文
+                              {t('subscriptions.viewOriginal')}
                             </a>
                           </div>
                         </div>
@@ -467,7 +468,7 @@ const UrlSubscriptions: React.FC = () => {
                     ))}
                     {subscription.crawledContents.length > 5 && (
                       <div className="text-center text-xs text-gray-500 pt-2">
-                        还有 {subscription.crawledContents.length - 5} 条内容...
+                        {t('subscriptions.moreContent', { count: subscription.crawledContents.length - 5 })}
                       </div>
                     )}
                   </div>
@@ -484,7 +485,7 @@ const UrlSubscriptions: React.FC = () => {
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col">
             {/* 标题栏 */}
             <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">添加URL进行内容爬取</h3>
+              <h3 className="text-xl font-semibold text-gray-900">{t('subscriptions.addUrlModalTitle')}</h3>
               <button
                 onClick={() => {
                   setShowAddModal(false);
@@ -502,7 +503,7 @@ const UrlSubscriptions: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    输入网站URL
+                    {t('subscriptions.enterUrl')}
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -522,7 +523,7 @@ const UrlSubscriptions: React.FC = () => {
                       ) : (
                         <Search className="w-4 h-4" />
                       )}
-                      分析URL
+                      {t('subscriptions.analyzeUrl')}
                     </button>
                   </div>
                 </div>
@@ -533,14 +534,14 @@ const UrlSubscriptions: React.FC = () => {
                     type="text"
                     value={newSubscription.name}
                     onChange={(e) => setNewSubscription({...newSubscription, name: e.target.value})}
-                    placeholder="订阅名称"
+                    placeholder={t('subscriptions.subscriptionName')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
                   />
                   <input
                     type="url"
                     value={newSubscription.url}
                     onChange={(e) => setNewSubscription({...newSubscription, url: e.target.value})}
-                    placeholder="URL地址"
+                    placeholder={t('subscriptions.urlAddress')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
                   />
                   <select
@@ -548,16 +549,16 @@ const UrlSubscriptions: React.FC = () => {
                     onChange={(e) => setNewSubscription({...newSubscription, type: e.target.value as any})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
                   >
-                    <option value="Website">网站爬取</option>
-                    <option value="RSS">RSS源</option>
-                    <option value="API">API接口</option>
+                    <option value="Website">{t('subscriptions.websiteCrawl')}</option>
+                    <option value="RSS">{t('subscriptions.rssFeed')}</option>
+                    <option value="API">{t('subscriptions.apiInterface')}</option>
                   </select>
                   <button
                     onClick={handleAddSubscription}
                     disabled={!newSubscription.name || !newSubscription.url}
                     className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                   >
-                    添加并开始爬取
+                    {t('subscriptions.addAndStart')}
                   </button>
                 </div>
               </div>
@@ -565,13 +566,13 @@ const UrlSubscriptions: React.FC = () => {
 
             {/* 功能说明 */}
             <div className="p-6 bg-gray-50">
-              <h4 className="font-semibold text-gray-900 mb-2">功能说明</h4>
+              <h4 className="font-semibold text-gray-900 mb-2">{t('subscriptions.featureDesc')}</h4>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• 输入网站URL后，系统将自动爬取该网站过去30天的内容</li>
-                <li>• 支持爬取新闻文章、博客文章、产品更新等内容</li>
-                <li>• 爬取完成后，可以下载为JSON、CSV或TXT格式</li>
-                <li>• 支持定期更新，获取最新的网站内容</li>
-                <li>• 所有内容都包含发布时间和爬取时间信息</li>
+                <li>• {t('subscriptions.featureDesc1')}</li>
+                <li>• {t('subscriptions.featureDesc2')}</li>
+                <li>• {t('subscriptions.featureDesc3')}</li>
+                <li>• {t('subscriptions.featureDesc4')}</li>
+                <li>• {t('subscriptions.featureDesc5')}</li>
               </ul>
             </div>
           </div>
@@ -587,7 +588,7 @@ const UrlSubscriptions: React.FC = () => {
               <div className="flex-1 mr-4">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="px-2 py-1 rounded-full bg-green-100 text-green-800 text-[10px] font-bold uppercase">
-                    文章预览
+                    {t('subscriptions.articlePreview')}
                   </span>
                   <span className="text-xs text-gray-500">
                     {new Date(previewArticle.publishedAt).toLocaleString()}
@@ -598,9 +599,9 @@ const UrlSubscriptions: React.FC = () => {
                 </h3>
                 <div className="flex items-center gap-4 text-sm text-gray-600">
                   {previewArticle.author && (
-                    <span>作者: {previewArticle.author}</span>
+                    <span>{t('subscriptions.author')} {previewArticle.author}</span>
                   )}
-                  <span>爬取时间: {new Date(previewArticle.crawledAt).toLocaleString()}</span>
+                  <span>{t('subscriptions.crawlTime')} {new Date(previewArticle.crawledAt).toLocaleString()}</span>
                 </div>
               </div>
               <button
@@ -617,7 +618,7 @@ const UrlSubscriptions: React.FC = () => {
                 <div className="flex items-center justify-center h-64">
                   <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600">正在加载文章内容...</p>
+                    <p className="text-gray-600">{t('subscriptions.loadingArticle')}</p>
                   </div>
                 </div>
               ) : (
@@ -625,7 +626,7 @@ const UrlSubscriptions: React.FC = () => {
                   <div className="space-y-4">
                     {/* 文章摘要 */}
                     <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-semibold text-gray-900 mb-2">文章摘要</h4>
+                      <h4 className="font-semibold text-gray-900 mb-2">{t('subscriptions.articleSummary')}</h4>
                       <p className="text-gray-700 leading-relaxed">
                         {previewArticle.content}
                       </p>
@@ -633,16 +634,16 @@ const UrlSubscriptions: React.FC = () => {
 
                     {/* 文章信息 */}
                     <div className="bg-blue-50 rounded-lg p-4">
-                      <h4 className="font-semibold text-gray-900 mb-2">文章信息</h4>
+                      <h4 className="font-semibold text-gray-900 mb-2">{t('subscriptions.articleInfo')}</h4>
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <strong>发布时间:</strong> {new Date(previewArticle.publishedAt).toLocaleString()}
+                          <strong>{t('subscriptions.publishedTime')}</strong> {new Date(previewArticle.publishedAt).toLocaleString()}
                         </div>
                         <div>
-                          <strong>爬取时间:</strong> {new Date(previewArticle.crawledAt).toLocaleString()}
+                          <strong>{t('subscriptions.crawlTimeLabel')}</strong> {new Date(previewArticle.crawledAt).toLocaleString()}
                         </div>
                         <div>
-                          <strong>文章链接:</strong>
+                          <strong>{t('subscriptions.articleLink')}</strong>
                           <a
                             href={previewArticle.url}
                             target="_blank"
@@ -654,13 +655,13 @@ const UrlSubscriptions: React.FC = () => {
                         </div>
                         {previewArticle.wordCount && (
                           <div>
-                            <strong>字数统计:</strong> {previewArticle.wordCount} 字
+                            <strong>{t('subscriptions.wordCount')}</strong> {previewArticle.wordCount} {t('subscriptions.words')}
                           </div>
                         )}
                       </div>
                       {previewArticle.tags && previewArticle.tags.length > 0 && (
                         <div className="mt-3">
-                          <strong>标签:</strong>
+                          <strong>{t('subscriptions.tags')}</strong>
                           <div className="flex flex-wrap gap-2 mt-1">
                             {previewArticle.tags.map((tag, index) => (
                               <span
@@ -684,13 +685,13 @@ const UrlSubscriptions: React.FC = () => {
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
                       >
                         <ExternalLink className="w-4 h-4" />
-                        访问原文
+                        {t('subscriptions.visitOriginal')}
                       </a>
                       <button
                         onClick={() => setPreviewArticle(null)}
                         className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                       >
-                        关闭预览
+                        {t('subscriptions.closePreview')}
                       </button>
                     </div>
                   </div>

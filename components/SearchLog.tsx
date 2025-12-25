@@ -33,9 +33,9 @@ const SearchLog: React.FC = () => {
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
 
-    if (diffMins < 1) return '刚刚';
-    if (diffMins < 60) return `${diffMins} 分钟前`;
-    if (diffMins < 1440) return `${Math.floor(diffMins / 60)} 小时前`;
+    if (diffMins < 1) return t('common.justNow');
+    if (diffMins < 60) return t('common.minutesAgo', { count: diffMins });
+    if (diffMins < 1440) return t('common.hoursAgo', { count: Math.floor(diffMins / 60) });
     return date.toLocaleDateString();
   };
 
@@ -53,14 +53,14 @@ const SearchLog: React.FC = () => {
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
           <Clock className="w-4 h-4" />
-          搜索历史
+          {t('common.searchHistory')}
         </h3>
         <div className="flex items-center gap-2">
           {searchHistory.length > 0 && (
             <button
               onClick={clearHistory}
               className="text-gray-400 hover:text-red-500 transition-colors"
-              title="清除历史"
+              title={t('common.clearHistory')}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -69,7 +69,7 @@ const SearchLog: React.FC = () => {
             onClick={() => setIsExpanded(!isExpanded)}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            {isExpanded ? '收起' : '展开'}
+            {isExpanded ? t('common.collapse') : t('common.expand')}
           </button>
         </div>
       </div>
@@ -90,7 +90,7 @@ const SearchLog: React.FC = () => {
                   <div className="text-xs text-gray-500">
                     {formatTime(entry.timestamp)}
                     {entry.processingTime && ` • ${entry.processingTime.toFixed(1)}s`}
-                    {entry.articleCount !== undefined && ` • ${entry.articleCount} 篇文章`}
+                    {entry.articleCount !== undefined && ` • ${t('common.articleCount', { count: entry.articleCount })}`}
                   </div>
                 </div>
               </div>
@@ -100,7 +100,7 @@ const SearchLog: React.FC = () => {
                   window.location.href = `#search=${encodeURIComponent(entry.keyword)}`;
                 }}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
-                title="重新搜索"
+                title={t('common.searchAgain')}
               >
                 <ExternalLink className="w-4 h-4" />
               </button>

@@ -6,7 +6,7 @@ import { resources } from '../translations';
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, vars?: Record<string, string | number>) => string;
 }
 
 const LANGUAGE_STORAGE_KEY = 'newsnexus-language';
@@ -61,12 +61,14 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   };
 
-  // 更新 HTML 文档的 lang 属性
+  // 更新 HTML 文档的 lang 和 dir 属性（支持 RTL）
   useEffect(() => {
     document.documentElement.lang = language;
+    // 所有语言使用 LTR（从左到右）布局
+    document.documentElement.dir = 'ltr';
   }, [language]);
 
-  const t = (path: string): string => {
+  const t = (path: string, vars?: Record<string, string | number>): string => {
     const keys = path.split('.');
     let current: any = resources[language];
     let fallback: any = resources[Language.English];
@@ -85,7 +87,16 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
     }
 
-    return current || fallback || path;
+    let result = current || fallback || path;
+
+    // simple template interpolation: t('key', { name: 'x' }) => replaces {name}
+    if (vars) {
+      for (const [k, v] of Object.entries(vars)) {
+        result = result.replaceAll(`{${k}}`, String(v));
+      }
+    }
+
+    return result;
   };
 
   return (

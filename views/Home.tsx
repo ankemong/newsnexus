@@ -80,7 +80,7 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
                       onClick={() => setIsLangMenuOpen(false)}
                     />
                     <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 py-1 max-h-[400px] overflow-y-auto z-50 scrollbar-hide">
-                      <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Select Region</div>
+                      <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t('common.selectLanguage')}</div>
                       {sortedLanguages.map((lang) => (
                         <button
                           key={lang}
@@ -211,8 +211,8 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
               <div className="flex items-center gap-3 mb-2">
                  <div className="p-2 bg-black rounded-lg"><Globe className="w-4 h-4 text-white" /></div>
                  <div>
-                    <div className="text-[10px] uppercase font-bold text-gray-400">Status</div>
-                    <div className="text-sm font-bold">System Operational</div>
+                    <div className="text-[10px] uppercase font-bold text-gray-400">{t('home.statusLabel')}</div>
+                    <div className="text-sm font-bold">{t('home.statusOperational')}</div>
                  </div>
               </div>
               <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
@@ -223,7 +223,7 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
            <div className="absolute -left-8 bottom-20 bg-black text-white p-5 rounded-xl shadow-2xl w-64 animate-float-delayed hidden lg:block">
               <div className="flex justify-between items-end">
                  <div>
-                    <div className="text-xs text-gray-400 mb-1">Total Crawled</div>
+                    <div className="text-xs text-gray-400 mb-1">{t('home.totalCrawled')}</div>
                     <div className="text-2xl font-bold">1,204,592</div>
                  </div>
                  <BarChart3 className="w-6 h-6 text-gray-500" />
@@ -377,13 +377,13 @@ const Home: React.FC<HomeProps> = ({ setView }) => {
                           <span className="font-bold text-xl text-black tracking-tight">NewsNexus</span>
                       </div>
                       <p className="text-gray-500 text-sm leading-relaxed font-medium">
-                          Empowering professionals with real-time global intelligence.
+                          {t('home.footerDesc')}
                       </p>
                   </div>
                   
                   {/* Right Column (Product) */}
                   <div>
-                      <h4 className="font-bold text-gray-900 mb-6 text-xs uppercase tracking-widest">Product</h4>
+                      <h4 className="font-bold text-gray-900 mb-6 text-xs uppercase tracking-widest">{t('home.headerProduct')}</h4>
                       <ul className="space-y-4 text-sm text-gray-600 font-medium">
                           <li>
                             <button onClick={() => setView('login')} className="hover:text-black transition-colors text-left">

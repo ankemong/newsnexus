@@ -14,14 +14,14 @@ const StatItem: React.FC<StatItemProps> = ({ icon: Icon, label, value, change, c
 
   return (
     <div className="flex items-center p-4 bg-white bg-opacity-5 rounded-lg">
-      <div className={`p-3 rounded-full mr-4`} style={{ backgroundColor: color, boxShadow: `0 4px 12px ${color}40` }}>
+      <div className={`p-3 rounded-full mr-4 rtl:ml-4 rtl:mr-0`} style={{ backgroundColor: color, boxShadow: `0 4px 12px ${color}40` }}>
         <Icon className="w-6 h-6 text-white" />
       </div>
       <div>
         <p className="text-sm text-gray-400">{label}</p>
         <p className="text-2xl font-bold text-white">{value}</p>
       </div>
-      <div className={`ml-auto text-sm font-semibold flex items-center ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
+      <div className={`ml-auto rtl:mr-auto rtl:ml-0 text-sm font-semibold flex items-center ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
         {isPositive ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
         <span>{change.replace('-', '')}</span>
       </div>

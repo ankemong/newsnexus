@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { Bell, Check, Mail, Settings } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Notifications: React.FC = () => {
+  const { t } = useLanguage();
+
   const [notifications, setNotifications] = useState([
-    { id: 1, title: 'Keyword Alert: "Tesla"', msg: 'New article found with high sentiment score.', time: '2 mins ago', read: false },
-    { id: 2, title: 'System Update', msg: 'Crawler engine updated to v2.1', time: '1 hour ago', read: false },
-    { id: 3, title: 'Subscription Error', msg: 'Failed to fetch RSS from TechCrunch', time: '5 hours ago', read: true },
+    { id: 1, title: t('notifications.sample.keywordAlertTitle'), msg: t('notifications.sample.keywordAlertMsg'), time: t('notifications.sample.time2m'), read: false },
+    { id: 2, title: t('notifications.sample.systemUpdateTitle'), msg: t('notifications.sample.systemUpdateMsg'), time: t('notifications.sample.time1h'), read: false },
+    { id: 3, title: t('notifications.sample.subscriptionErrorTitle'), msg: t('notifications.sample.subscriptionErrorMsg'), time: t('notifications.sample.time5h'), read: true },
   ]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Notifications</h2>
-        <button className="text-sm text-gray-600 hover:text-black font-medium underline">Mark all as read</button>
+        <h2 className="text-2xl font-bold text-gray-900">{t('notifications.title')}</h2>
+        <button className="text-sm text-gray-600 hover:text-black font-medium underline">{t('notifications.markAllRead')}</button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -41,13 +44,13 @@ const Notifications: React.FC = () => {
         <div className="bg-white p-6 rounded-xl border border-gray-200 h-fit">
            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              Preferences
+              {t('notifications.preferences')}
            </h3>
            <div className="space-y-4">
               <div className="flex items-center justify-between">
                  <div className="flex items-center gap-2">
                     <Bell className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm text-gray-700">Push Notifications</span>
+                    <span className="text-sm text-gray-700">{t('notifications.push')}</span>
                  </div>
                  <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                     <input type="checkbox" name="toggle" id="toggle" className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer checked:right-0 right-5" checked readOnly/>
@@ -57,7 +60,7 @@ const Notifications: React.FC = () => {
               <div className="flex items-center justify-between">
                  <div className="flex items-center gap-2">
                     <Mail className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm text-gray-700">Email Digest</span>
+                    <span className="text-sm text-gray-700">{t('notifications.emailDigest')}</span>
                  </div>
                  <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                     <input type="checkbox" className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer right-5"/>

@@ -42,7 +42,7 @@ const Profile: React.FC = () => {
        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                <Globe className="w-5 h-5 text-gray-400" />
-               Localization
+               {t('profile.localization')}
            </h3>
            <div className="grid md:grid-cols-2 gap-6">
                <div>
@@ -56,7 +56,7 @@ const Profile: React.FC = () => {
                            <option key={code} value={code}>{label}</option>
                        ))}
                    </select>
-                   <p className="text-xs text-gray-500 mt-1">Select your preferred language for the dashboard interface.</p>
+                   <p className="text-xs text-gray-500 mt-1">{t('profile.languageHelp')}</p>
                </div>
                <div>
                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('profile.timezone')}</label>
@@ -82,17 +82,17 @@ const Profile: React.FC = () => {
                <div className="flex items-center justify-between py-2">
                    <div>
                        <p className="font-medium text-gray-900">{t('profile.twoFactor')}</p>
-                       <p className="text-sm text-gray-500">Add an extra layer of security to your account.</p>
+                       <p className="text-sm text-gray-500">{t('profile.twoFactorHelp')}</p>
                    </div>
-                   <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 text-black">Enable</button>
+                   <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 text-black">{t('profile.enable')}</button>
                </div>
                <div className="flex items-center justify-between py-2 border-t border-gray-100">
                    <div>
                        <p className="font-medium text-gray-900">{t('auth.password')}</p>
-                       <p className="text-sm text-gray-500">Last changed 3 months ago.</p>
+                       <p className="text-sm text-gray-500">{t('profile.passwordLastChanged')}</p>
                    </div>
                    <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2 text-black">
-                       <Lock className="w-3 h-3" /> Change
+                       <Lock className="w-3 h-3" /> {t('profile.changePassword')}
                    </button>
                </div>
            </div>
@@ -105,7 +105,7 @@ const Profile: React.FC = () => {
                {t('profile.data')}
            </h3>
            <p className="text-sm text-gray-500 mb-4">
-               Download a copy of your data including subscription history, crawled articles, and preferences (GDPR Compliance).
+               {t('profile.dataHelp')}
            </p>
            <button className="px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800">{t('profile.download')}</button>
        </div>

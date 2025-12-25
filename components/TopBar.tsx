@@ -17,8 +17,9 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick, title, onNotificationClick
   const langMenuRef = useRef<HTMLDivElement>(null);
   const langButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Sort languages alphabetically
-  const sortedLanguages = Object.values(Language).sort((a, b) =>
+  // Sort languages by label alphabetically (locale-aware)
+  // Use LANGUAGE_LABELS keys to avoid showing languages missing labels.
+  const sortedLanguages = (Object.keys(LANGUAGE_LABELS) as Language[]).sort((a, b) =>
     LANGUAGE_LABELS[a].localeCompare(LANGUAGE_LABELS[b])
   );
 
@@ -84,7 +85,7 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick, title, onNotificationClick
 
             {isLangMenuOpen && (
               <div
-                className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 py-1 max-h-[400px] overflow-y-auto z-50 scrollbar-hide animate-in fade-in zoom-in-95 duration-100"
+                className="absolute top-full right-0 rtl:left-0 rtl:right-auto mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 py-1 max-h-[400px] overflow-y-auto z-50 scrollbar-hide animate-in fade-in zoom-in-95 duration-100"
                 role="menu"
                 aria-labelledby="language-button"
               >
@@ -114,7 +115,7 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick, title, onNotificationClick
 
         {/* Global Search Bar - simplified for demo */}
         <div className="hidden md:flex items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2 w-64 focus-within:ring-2 focus-within:ring-black transition-all">
-          <Search className="w-4 h-4 text-gray-400 mr-2" />
+          <Search className="w-4 h-4 text-gray-400 mr-2 rtl:ml-2 rtl:mr-0" />
           <input 
             type="text" 
             placeholder={t('common.searchPlaceholder')} 
@@ -127,7 +128,7 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick, title, onNotificationClick
            className="relative p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
         >
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-black rounded-full border-2 border-white"></span>
+          <span className="absolute top-1 right-1 rtl:left-1 rtl:right-auto w-2.5 h-2.5 bg-black rounded-full border-2 border-white"></span>
         </button>
         
         <div 

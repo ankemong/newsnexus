@@ -1,8 +1,9 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Users, Rss, Clock, Newspaper, Search, Play, Loader2, Calendar, ArrowRight } from 'lucide-react';
+import { Users, Rss, Clock, Newspaper, Search, Play, Loader2, Calendar, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { Language } from '../types';
 import { crawlNewsByKeyword } from '../services/geminiService';
 import { getLocalStats, addArticlesToStats, recordSearchInStats, LocalStatsData } from '../services/localStatsService';
 import { Article } from '../types';
@@ -12,7 +13,7 @@ import SearchLog from '../components/SearchLog';
 interface DashboardProps {}
 
 const Dashboard: React.FC<DashboardProps> = () => {
-  const { t, language } = useLanguage();
+  const { t, language: currentLang } = useLanguage();
 
   // Search State
   const [keyword, setKeyword] = useState('');
@@ -45,7 +46,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
     setIsCrawling(true);
     setHasSearched(true);
     setArticles([]);
-    setSearchStatus(`正在搜索 "${keyword}"...`);
+    setSearchStatus(t('crawler.searching', { keyword }));
     setSearchProgress(10);
 
     const startTime = Date.now();
@@ -53,13 +54,13 @@ const Dashboard: React.FC<DashboardProps> = () => {
     try {
         // 模拟搜索进度
         setSearchProgress(30);
-        setSearchStatus('连接到 Gemini API...');
+        setSearchStatus(t('crawler.connecting'));
 
         const results = await crawlNewsByKeyword(keyword, [language]);
         const processingTime = (Date.now() - startTime) / 1000;
 
         setSearchProgress(70);
-        setSearchStatus(`找到 ${results.length} 篇相关文章...`);
+        setSearchStatus(t('crawler.found', { count: results.length }));
 
         // 模拟处理中
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -72,7 +73,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
         recordSearchInStats(keyword, processingTime, results.length);
 
         setSearchProgress(100);
-        setSearchStatus(`搜索完成！耗时 ${processingTime.toFixed(1)} 秒，找到 ${results.length} 篇文章`);
+        setSearchStatus(t('crawler.completed', { time: processingTime.toFixed(1), count: results.length }));
 
 
 
@@ -108,14 +109,14 @@ const Dashboard: React.FC<DashboardProps> = () => {
 
         <div className="flex flex-col md:flex-row gap-4 mb-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-3 text-gray-400 w-5 h-5" />
             <input
               type="text"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={t('crawler.inputPlaceholder')}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
+              className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 rtl:pl-4 rtl:pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
               disabled={isCrawling}
             />
           </div>
@@ -125,7 +126,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
             className="px-6 py-2 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 min-w-[120px]"
           >
             {isCrawling ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-            {isCrawling ? '搜索中...' : t('crawler.startTracking')}
+            {isCrawling ? t('crawler.searchingArticles') : t('crawler.startTracking')}
           </button>
         </div>
 
@@ -178,7 +179,12 @@ const Dashboard: React.FC<DashboardProps> = () => {
                         <div className="flex items-center justify-between pt-4 border-t border-gray-50">
                             <span className="text-xs font-semibold text-gray-500">{article.source}</span>
                             <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-black flex items-center gap-1 hover:underline">
-                                Read Source <ArrowRight className="w-4 h-4" />
+                                {t('articles.readFull')} 
+                                {currentLang === Language.Arabic ? (
+                                  <ArrowLeft className="w-4 h-4" />
+                                ) : (
+                                  <ArrowRight className="w-4 h-4" />
+                                )}
                             </a>
                         </div>
                     </div>
@@ -189,17 +195,17 @@ const Dashboard: React.FC<DashboardProps> = () => {
                 {isCrawling ? (
                         <>
                         <Loader2 className="w-10 h-10 animate-spin mb-4 text-gray-400" />
-                        <p className="text-lg">Searching for articles...</p>
+                        <p className="text-lg">{t('crawler.searchingArticles')}</p>
                         </>
                 ) : hasSearched ? (
                         <>
                         <Search className="w-16 h-16 mb-4 text-gray-200" />
-                        <p className="text-lg">No articles found for "{keyword}"</p>
+                        <p className="text-lg">{t('crawler.noArticles', { keyword })}</p>
                         </>
                 ) : (
                         <>
                         <Search className="w-16 h-16 mb-4 text-gray-200" />
-                        <p className="text-lg">Enter a keyword above to start searching.</p>
+                        <p className="text-lg">{t('crawler.enterKeyword')}</p>
                         </>
                 )}
             </div>
