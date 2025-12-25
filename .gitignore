@@ -184,3 +184,8 @@ static/uploads/
 
 # SDK 文件
 SDK/
+
+# 测试文件
+*-test.html
+*-test.js
+test-*
