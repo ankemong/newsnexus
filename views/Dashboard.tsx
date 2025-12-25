@@ -56,7 +56,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
         setSearchProgress(30);
         setSearchStatus(t('crawler.connecting'));
 
-        const results = await crawlNewsByKeyword(keyword, [language]);
+        const results = await crawlNewsByKeyword(keyword, [currentLang]);
         const processingTime = (Date.now() - startTime) / 1000;
 
         setSearchProgress(70);
