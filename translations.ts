@@ -11,7 +11,6 @@ interface TranslationStructure {
     analytics: string;
     notifications: string;
     profile: string;
-    payment: string;
     logout: string;
   };
   common: {
@@ -333,7 +332,7 @@ const en: TranslationStructure = {
     analytics: 'Analytics',
     notifications: 'Notifications',
     profile: 'My Account',
-    payment: 'Donate & Support',
+    
     logout: 'Sign Out'
   },
   common: {
@@ -656,7 +655,7 @@ const zh: TranslationStructure = {
     analytics: '数据分析',
     notifications: '通知中心',
     profile: '我的账户',
-    payment: '捐款赞助',
+    
     logout: '退出登录'
   },
 
@@ -979,7 +978,7 @@ const zhTW: TranslationStructure = {
     analytics: '數據分析',
     notifications: '通知中心',
     profile: '我的帳戶',
-    payment: '捐款贊助',
+    
     logout: '登出'
   },
   crawler: {
@@ -1069,7 +1068,7 @@ const createFullLang = (
 };
 
 const es = createFullLang(en, {
-  nav: { dashboard: 'Tablero', crawler: 'Suscripción Palabras Clave', subscriptions: 'Suscripciones', articles: 'Noticias', analytics: 'Analítica', notifications: 'Notificaciones', profile: 'Mi Cuenta', payment: 'Facturación', logout: 'Cerrar Sesión' },
+  nav: { dashboard: 'Tablero', crawler: 'Suscripción Palabras Clave', subscriptions: 'Suscripciones', articles: 'Noticias', analytics: 'Analítica', notifications: 'Notificaciones', profile: 'Mi Cuenta',  logout: 'Cerrar Sesión' },
   dashboard: {
     totalArticles: 'Total de Artículos',
     activeCrawlers: 'Búsquedas Activas',
@@ -1391,7 +1390,7 @@ const fr = createFullLang(en, {
     statusOperational: "Système opérationnel",
     totalCrawled: "Total collecté"
   },
-  nav: { dashboard: 'Tableau de bord', crawler: 'Abonnement Mots-clés', subscriptions: 'Abonnements', articles: 'Articles', analytics: 'Analytique', notifications: 'Notifications', profile: 'Mon Compte', payment: 'Facturation', logout: 'Déconnexion' },
+  nav: { dashboard: 'Tableau de bord', crawler: 'Abonnement Mots-clés', subscriptions: 'Abonnements', articles: 'Articles', analytics: 'Analytique', notifications: 'Notifications', profile: 'Mon Compte',  logout: 'Déconnexion' },
   dashboard: {
     totalArticles: 'Total Articles',
     activeCrawlers: 'Recherches Actives',
@@ -1671,7 +1670,7 @@ const de = createFullLang(en, {
     statusOperational: "System betriebsbereit",
     totalCrawled: "Insgesamt erfasst"
   },
-  nav: { dashboard: 'Dashboard', crawler: 'Keyword-Abo', subscriptions: 'Abos', articles: 'Artikel', analytics: 'Analytik', notifications: 'Benachrichtigungen', profile: 'Mein Konto', payment: 'Abrechnung', logout: 'Abmelden' },
+  nav: { dashboard: 'Dashboard', crawler: 'Keyword-Abo', subscriptions: 'Abos', articles: 'Artikel', analytics: 'Analytik', notifications: 'Benachrichtigungen', profile: 'Mein Konto',  logout: 'Abmelden' },
   dashboard: {
     totalArticles: 'Gesamtartikel',
     activeCrawlers: 'Aktive Suchen',
@@ -1913,7 +1912,7 @@ const de = createFullLang(en, {
 
 // Update Russian
 const ru = createFullLang(en, {
-    nav: { dashboard: 'Дашборд', crawler: 'Подписка на ключевые слова', subscriptions: 'URL Подписки', articles: 'Лента статей', analytics: 'Аналитика', notifications: 'Уведомления', profile: 'Мой профиль', payment: 'Оплата', logout: 'Выйти' },
+    nav: { dashboard: 'Дашборд', crawler: 'Подписка на ключевые слова', subscriptions: 'URL Подписки', articles: 'Лента статей', analytics: 'Аналитика', notifications: 'Уведомления', profile: 'Мой профиль',  logout: 'Выйти' },
     dashboard: {
       totalArticles: 'Всего статей',
       activeCrawlers: 'Активные поиски',
@@ -2174,7 +2173,7 @@ const ru = createFullLang(en, {
 });
 
 const ja = createFullLang(en, {
-    nav: { dashboard: 'ダッシュボード', crawler: 'キーワード購読', subscriptions: '購読', articles: '記事', analytics: '分析', notifications: '通知', profile: 'アカウント', payment: '支払い', logout: 'ログアウト' },
+    nav: { dashboard: 'ダッシュボード', crawler: 'キーワード購読', subscriptions: '購読', articles: '記事', analytics: '分析', notifications: '通知', profile: 'アカウント',  logout: 'ログアウト' },
     dashboard: {
       totalArticles: '総記事数',
       activeCrawlers: 'アクティブな検索',
@@ -2458,7 +2457,7 @@ const ko = createFullLang(en, {
     analytics: '분석',
     notifications: '알림',
     profile: '프로필',
-    payment: '요금제',
+    
     logout: '로그아웃',
   },
   common: {
@@ -2787,7 +2786,7 @@ const ar = createFullLang(en, {
     analytics: 'التحليلات',
     notifications: 'الإشعارات',
     profile: 'الملف الشخصي',
-    payment: 'الأسعار',
+    
     logout: 'تسجيل الخروج',
   },
   common: {
@@ -3091,7 +3090,7 @@ const pt = createFullLang(en, {
     analytics: 'Análises',
     notifications: 'Notificações',
     profile: 'Perfil',
-    payment: 'Planos',
+    
     logout: 'Sair',
   },
   common: {
@@ -3395,7 +3394,7 @@ const hi = createFullLang(en, {
     analytics: 'विश्लेषण',
     notifications: 'सूचनाएँ',
     profile: 'प्रोफ़ाइल',
-    payment: 'योजनाएँ',
+    
     logout: 'लॉग आउट',
   },
   common: {
@@ -3699,7 +3698,7 @@ const it = createFullLang(en, {
     analytics: 'Analisi',
     notifications: 'Notifiche',
     profile: 'Profilo',
-    payment: 'Piani',
+    
     logout: 'Esci',
   },
   common: {
@@ -4003,7 +4002,7 @@ const tr = createFullLang(en, {
     analytics: 'Analitik',
     notifications: 'Bildirimler',
     profile: 'Profil',
-    payment: 'Planlar',
+    
     logout: 'Çıkış',
   },
   common: {
@@ -4307,7 +4306,7 @@ const nl = createFullLang(en, {
     analytics: 'Analyse',
     notifications: 'Meldingen',
     profile: 'Profiel',
-    payment: 'Plannen',
+    
     logout: 'Uitloggen',
   },
   common: {
@@ -4611,7 +4610,7 @@ const pl = createFullLang(en, {
     analytics: 'Analityka',
     notifications: 'Powiadomienia',
     profile: 'Profil',
-    payment: 'Plany',
+    
     logout: 'Wyloguj',
   },
   common: {
@@ -4915,7 +4914,7 @@ const id = createFullLang(en, {
     analytics: 'Analitik',
     notifications: 'Notifikasi',
     profile: 'Profil',
-    payment: 'Paket',
+    
     logout: 'Keluar',
   },
   common: {
@@ -5219,7 +5218,7 @@ const vi = createFullLang(en, {
     analytics: 'Phân tích',
     notifications: 'Thông báo',
     profile: 'Hồ sơ',
-    payment: 'Gói',
+    
     logout: 'Đăng xuất',
   },
   common: {
@@ -5523,7 +5522,7 @@ const th = createFullLang(en, {
     analytics: 'การวิเคราะห์',
     notifications: 'การแจ้งเตือน',
     profile: 'โปรไฟล์',
-    payment: 'แพ็กเกจ',
+    
     logout: 'ออกจากระบบ',
   },
   common: {

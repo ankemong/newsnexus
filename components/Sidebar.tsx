@@ -34,7 +34,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setView, isMobileOpen, s
   const accountItems = [
     { id: 'notifications', label: t('nav.notifications'), icon: Bell },
     { id: 'profile', label: t('nav.profile'), icon: User },
-    { id: 'payment', label: t('nav.payment'), icon: CreditCard },
   ];
 
   const handleNav = (view: ViewState) => {

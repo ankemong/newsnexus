@@ -8,7 +8,6 @@ export type ViewState =
   | 'dashboard'
   | 'subscriptions'
   | 'notifications'
-  | 'payment'
   | 'profile'
   // Info pages
   | 'docs'

@@ -10,7 +10,6 @@ import UrlSubscriptions from './views/UrlSubscriptions';
 import Notifications from './views/Notifications';
 import Profile from './views/Profile';
 import Auth from './views/Auth';
-import Pricing from './views/Pricing';
 import InfoPage from './views/InfoPage';
 import { ViewState, Article } from './types';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
@@ -176,8 +175,6 @@ const AppContent: React.FC = () => {
         return <Notifications />;
       case 'profile':
         return <Profile />;
-      case 'payment':
-        return <Pricing />;
       default:
         // Handle info pages for logged-in users too if needed, or redirect
         if (['docs', 'blog', 'community', 'help', 'privacy', 'terms', 'cookie-policy', 'contact'].includes(currentView)) {
@@ -193,7 +190,6 @@ const AppContent: React.FC = () => {
 
       case 'subscriptions': return t('nav.subscriptions');
       case 'notifications': return t('nav.notifications');
-      case 'payment': return t('nav.payment');
       case 'profile': return t('nav.profile');
       default: return 'NewsNexus';
     }
